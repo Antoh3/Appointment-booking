@@ -37,7 +37,7 @@ const storage = multer.diskStorage({
 
 
 // Register a new patient
-PatientRouter.post("/register",authenticateToken,uploadFields,registerPatient);
+PatientRouter.post("/register",authenticateToken,registerPatient);
 PatientRouter.post("/user", registerUser)
 // Login a patient
 PatientRouter.post("/login", loginPatient);

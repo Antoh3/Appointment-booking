@@ -24,7 +24,7 @@ const createAppointment = async (req, res) => {
 
         const patient = await prisma.patient.findUnique({
             where: {
-                userId: patientId
+                id: patientId
             }
         })
         console.log("patient name", patient.name);

@@ -21,6 +21,9 @@ function AuthProvider({ children }: {children:React.ReactNode}) {
         setRefreshToken(newRefreshToken);
     }
 
+    // console.log("Access token", accessToken,refreshToken);
+    
+
     const clearTokens = () => {
         setAccessToken(null);
         setRefreshToken(null);

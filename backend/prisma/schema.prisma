@@ -15,40 +15,23 @@ model User {
   password String
   role     Role
 
-  patient Patient[]
-
   feedback Feedback[]
 
-  Doctor Doctor[]
 }
 
 model Patient {
-  id                     String   @id @unique @default(uuid())
-  name                   String
-  email                  String @unique
-  phone                  String
-  birthDate              DateTime
-  gender                 String
-  address                String
-  occupation             String
-  emergencyContactName   String
-  emergencyContactNumber String
-  primaryPhysician       String
-  insuranceProvider      String?
-  insurancePolicyNumber  String?
-  allergies              String?
-  currentMedication      String?
-  familyMedicalHistory   String?
-  pastMedicalHistory     String?
-  identificationType     String
-  identificationNumber   String
-  identificationDocument String? // File path for the uploaded document
-  privacyConsent         Boolean
-  createdAt              DateTime @default(now())
-  role                   Role     @default(patient)
-
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
+  id                String   @id @unique @default(uuid())
+  firstName         String
+  lastName          String
+  email             String   @unique
+  phoneNumber       String
+  birthDate         String
+  gender            String
+  idNumber          String
+  permanentLocation String
+  password          String
+  createdAt         DateTime @default(now())
+  role              Role     @default(patient)
 
   appointments Appointment[]
 
@@ -57,28 +40,30 @@ model Patient {
 }
 
 model Doctor {
-  id                 String @id @unique @default(uuid())
+  id                 String  @id @unique @default(uuid())
   firstName          String
   lastName           String
-  email              String
+  email              String @unique
   phone              String
   gender             String
   specialization     String
   licenseNumber      String
   registrationNumber String
-  role               Role   @default(doctor)
+  password String
+  idFront            String?
+  idBack             String?
+  certificate        String?
+  role               Role    @default(doctor)
 
   appointments Appointment[]
   patients     Patient[]
 
-  userId String @unique
-  user   User @relation(fields: [userId], references: [id])
 }
 
 model Appointment {
   id                String   @id @unique @default(uuid())
   schedule          DateTime
-  status            Status @default(scheduled)
+  status            Status   @default(scheduled)
   primaryPhysician  String
   patientName       String
   reason            String
@@ -114,7 +99,7 @@ enum Role {
 }
 
 enum Status {
-  scheduled 
+  scheduled
   approved
   canceled
 }

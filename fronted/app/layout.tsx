@@ -1,39 +1,50 @@
-import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
-import "./globals.css";
+import "@/styles/globals.css";
+import { Metadata, Viewport } from "next";
+import clsx from "clsx";
 
-import { cn } from '@/lib/utils'
-import { ThemeProvider } from "@/components/Theme-Provider";
-import { ToastContainer } from 'react-toastify';
+import { Providers } from "./providers";
+
+import { siteConfig } from "@/config/site";
+import { fontSans } from "@/config/fonts";
+import React from "react";
 import AuthProvider from "./context/AuthContext";
 
-const fontSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-sans'
-});
-
 export const metadata: Metadata = {
-  title: "CarePulse",
-  description: "A healthcare appointment management system",
+  title: {
+    default: siteConfig.name,
+    template: `%s - ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  icons: {
+    icon: "/icon.svg",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body className={cn('min-h-screen bg-dark-300 font-sans antialiased', fontSans.variable)}>
+    <html suppressHydrationWarning lang="en">
+      {/*<head ><title></title></head>*/}
+      <body
+        className={clsx(
+          "min-h-screen bg-background font-sans antialiased bg-primary/5",
+          fontSans.variable,
+        )}
+      >
         <AuthProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-          >
-            {/* <ToastContainer /> */}
+          <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
             {children}
-          </ThemeProvider>
+          </Providers>
         </AuthProvider>
       </body>
     </html>

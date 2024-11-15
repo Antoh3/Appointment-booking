@@ -7,11 +7,23 @@ const {
   getAllDoctors,
   updateAppointment,
   findDoctor,
-  doctorDetails
+  doctorDetails,
+  uploadDocuments
 } = require("../Controllers/Doctor.controller");
 const DoctorRouter = express.Router();
 const { authenticateToken  }= require("../Middlewares/JWT.authentication");
 const { DoctorAuth } = require("../Middlewares/RoleBased.authentication");
+const multer = require("multer");
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: 'uploads/',
+    filename:(req,file,cb)=>{
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, `${uniqueSuffix}-${file.originalname}`);
+    }
+  })
+})
 
 // Doctor Registration
 DoctorRouter.post("/user", register);
@@ -29,5 +41,13 @@ DoctorRouter.get("/all",authenticateToken,getAllDoctors);
 DoctorRouter.get("/:doctorId",authenticateToken, findDoctor);
 //only do changes in appoinment
 // DoctorRouter.patch("/appoinment/:doctorId", Auth, DoctorAuth, updateAppointment);
+DoctorRouter.post('/upload-documents',
+  upload.fields([
+    {name: 'idFront', maxCount: 1},
+    {name: 'idBack',maxCount: 1},
+    {name: 'certificate', maxCount: 1}
+  ]),
+  authenticateToken,uploadDocuments,
+);
 
 module.exports = DoctorRouter;

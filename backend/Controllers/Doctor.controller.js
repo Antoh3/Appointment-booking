@@ -1,7 +1,20 @@
 const { request } = require("express");
 const prisma = require('../prisma/prismaClient')
 const bcrypt = require('bcrypt')
-const { generateToken,generateRefreshToken } = require('../Middlewares/JWT.authentication') 
+const { generateToken,generateRefreshToken } = require('../Middlewares/JWT.authentication'); 
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+    destination:(req,file,cb) =>{
+        cb(null,'uploads/')
+    },
+    filename:(req,file,cb) =>{
+        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+        cb(null,`${uniqueSuffix}-${file.originalname}`)
+    }
+})
+
+const upload = multer({ storage });
 
 
 // Controller function for doctor registration
@@ -25,7 +38,7 @@ const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
 
         // Proceed with registration logic
-        const newDoctor = await prisma.user.create({
+        const newDoctor = await prisma.doctor.create({
             data: {
                 ...req.body,
                 password: hashedPassword
@@ -42,10 +55,11 @@ const register = async (req, res) => {
 // Controller function for doctor login
 const login = async (req, res) => {
     try {
+        const { email,password } = req.body;
         // Find the doctor by email
-        const doctor = await prisma.user.findUnique({
+        const doctor = await prisma.doctor.findUnique({
             where: {
-                email: req.body.email
+                email: email
             }
         });
 
@@ -55,7 +69,7 @@ const login = async (req, res) => {
         }
 
         // Compare the provided password with the stored hashed password
-        const passwordMatch = await bcrypt.compare(req.body.password, doctor.password);
+        const passwordMatch = await bcrypt.compare(password, doctor.password);
 
         // Check if the password is correct
         if (!passwordMatch) {
@@ -64,6 +78,7 @@ const login = async (req, res) => {
 
         const accessToken = generateToken(doctor.id, 'doctor');
         const refreshToken = generateRefreshToken(doctor.id, 'doctor')
+        
 
         //Set tokens in response headers
         res.setHeader('Authorization', `Bearer ${accessToken}`);
@@ -232,6 +247,24 @@ const getAllDoctors = async (req, res) => {
 };
 
 
+const uploadDocuments = async (req,res) => {
+    const  doctorId  = req.userId
+
+    try {
+        const doctor = await prisma.doctor.update({
+           where:{id : doctorId},
+           data:{
+            idFront: req.files?.idFront ? req.files.idFront[0].path : null,
+            idBack: req.files?.idBack ? req.files.idBack[0].path : null,
+            certificate: req.files?.certificate ? req.files.certificate[0].path : null,
+           },
+        });
+        res.status(200).json({success: true, doctor})
+    } catch (error) {
+        res.status(500).json({error:"Failed to upload documents"})
+    }
+};
+
 // Controller function for updating an appointment
 // const updateAppointment = async (req, res) => {
 //     try {
@@ -267,5 +300,6 @@ module.exports = {
     updateDoctor,
     getAllDoctors,
     // updateAppointment,
+    uploadDocuments,
     doctorDetails
 };

@@ -4,9 +4,11 @@ const prisma = require('../prisma/prismaClient')
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email, phone, password, role } = req.body;
+        const { firstName, lastName, email, phoneNumber, birthDate,
+                gender,idNumber,permanentLocation,password
+         } = req.body;
 
-        const existingUser = await prisma.user.findUnique({
+        const existingUser = await prisma.patient.findUnique({
             where: {
                 email: email,
             }
@@ -14,14 +16,18 @@ const registerUser = async (req, res) => {
         if (existingUser) {
             return res.status(400).json({ message: 'Email already exists!', status: false });
         }
-        const hashedPassword = await bcrypt.hash(password, 10)
+        const hashedPassword = await bcrypt.hash(password, 20)
 
-        const newUser = await prisma.user.create({
+        const newUser = await prisma.patient.create({
             data: {
-                name,
+                firstName,
+                lastName,
                 email,
-                phone,
-                role,
+                phoneNumber,
+                birthDate,
+                gender,
+                idNumber,
+                permanentLocation,
                 password: hashedPassword,
             },
         });
@@ -135,11 +141,13 @@ const loginPatient = async (req, res) => {
         const { email, password } = req.body;
 
         // Find the user by email
-        const user = await prisma.user.findUnique({
+        const user = await prisma.patient.findUnique({
             where: {
                 email: email,
             },
         });
+        
+        
 
         // Check if the user exists
         if (!user) {
@@ -154,13 +162,16 @@ const loginPatient = async (req, res) => {
 
         const accessToken = generateToken(user.id, 'patient');
         const refreshToken = generateRefreshToken(user.id, 'patient')
-
+        
+        console.log(accessToken);
+        
         //Set tokens in response headers
         res.setHeader('Authorization', `Bearer ${accessToken}`);
         res.setHeader('x-refresh-token', refreshToken);
         // res.header('x-access-token', accessToken);
         // res.header('x-refresh-token', refreshToken);
-
+        // console.log(req.userId,req.userRole);
+        
         res.status(200).json({message: "Login succesfull",accessToken,refreshToken,});
     } catch (error) {
         console.error(error);
@@ -179,7 +190,7 @@ const getPatientById = async (req, res) => {
         // Find the patient by ID
         const patient = await prisma.patient.findUnique({
             where: {
-                userId: patientId,
+                id: patientId,
             }
         })
 
@@ -233,6 +244,8 @@ const searchDoctors = async (req, res) => {
         res.status(500).json({ message: "Internal server error" })
     }
 }
+
+
 // Controller function to update a appointment
 const updateAppointment = async (req, res) => {
     try {
@@ -391,6 +404,8 @@ const updatePatientById = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+
 module.exports = {
     searchDoctors,
     registerUser,

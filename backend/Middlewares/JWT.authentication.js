@@ -32,7 +32,7 @@ const authenticateToken = (req, res, next) => {
     }
     req.userId = decoded.id; // Use 'id' from the decoded token
     req.userRole = decoded.role; // Include role (doctor or patient) from the token
-    // console.log('Decoded token:', decoded); // For debugging
+    console.log('Decoded token:', decoded); // For debugging
     next();
   });
 };
