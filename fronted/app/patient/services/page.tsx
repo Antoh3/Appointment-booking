@@ -4,13 +4,13 @@ import DiagnosisColumns from "@/components/UI/table/diagnosisColumn";
 import SearchBar from "@/components/AppSearchbar";
 
 export const metadata = {
-  title: "Diagnosis",
+  title: "Services",
 };
 
 const DiagnosisPage = () => {
   return (
     <SiteShell>
-      <SiteHeader heading="All Services" />
+      <SiteHeader heading="Services offered" />
       <SearchBar placeholder="search services...."/>
       <DiagnosisColumns />
     </SiteShell>

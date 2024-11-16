@@ -211,28 +211,32 @@ const getPatientById = async (req, res) => {
 
 const searchDoctors = async (req, res) => {
     try {
-        if (req.userRole !== 'patient') {
-            return res.status(403).json({ message: 'Access forbidden: Only patients can search for doctors' });
-        }
+        // if (req.userRole !== 'patient' || 'doctor') {
+        //     return res.status(403).json({ message: 'Access forbidden: Only patients can search for doctors' });
+        // }
 
-        const { specialization } = req.query;
-        if (!specialization) {
+        // const { specialization } = req.query;
+        const { query } = req.query;
+
+        if (!query) {
             return res.status(404).json({ message: "Please provide doctor specialization" })
         }
 
         const doctors = await prisma.doctor.findMany({
             where: {
-                specialization: {
-                    contains: specialization,
-                },
+                OR:[
+                    {specialization:{contains: query}},
+                    {firstName:{contains: query}},
+                    {lastName:{contains:query}}
+                ]
             },
-            select: {
-                firstName: true,
-                lastName: true,
-                email: true,
-                phone: true,
-                specialization: true
-            },
+            // select: {
+            //     firstName: true,
+            //     lastName: true,
+            //     email: true,
+            //     phone: true,
+            //     specialization: true
+            // },
         });
 
         if (doctors.length === 0) {

@@ -10,7 +10,7 @@ export const metadata = {
 const LabRecordsPage = () => {
   return (
     <SiteShell>
-      <SiteHeader heading="All Doctors" />
+      <SiteHeader heading="Available Doctors" />
       {/* <LabColumns /> */}
       <DoctorColumns/>
     </SiteShell>

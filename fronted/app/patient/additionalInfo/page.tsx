@@ -3,13 +3,13 @@ import SiteShell from "@/components/patient/SiteShell";
 import TriageDashboard from "@/components/patient/TriageDashboard";
 
 export const metadata = {
-  title: "Triage",
+  title: "AdditionalInfo",
 };
 
 const TriagePage = () => {
   return (
     <SiteShell>
-      <SiteHeader heading="Triage" />
+      <SiteHeader heading="AdditionalInfo" />
       <TriageDashboard />
     </SiteShell>
   );

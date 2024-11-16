@@ -31,7 +31,7 @@ export function AppAccountNav() {
           <Link href="/patient">Home</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/patient/diagnosis">Diagnosis</Link>
+          <Link href="/patient/services">Services</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/patient/prescriptions">Prescription records</Link>
@@ -40,22 +40,22 @@ export function AppAccountNav() {
           <Link href="/patient/appointments">Appointments</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/patient/lab-results">Lab Test Results</Link>
+          <Link href="/patient/doctors">All Doctors</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/patient/journal">Journal</Link>
+          <Link href="/patient/feedback">FeedBack</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/patient/allergies">Allergies</Link>
+          {/* <Link href="/patient/allergies">Allergies</Link> */}
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/patient/triage">Triage</Link>
+          <Link href="/patient/additionalInfo">AdditionalInfo</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/settings">Settings</Link>
+          <Link href="/patient/settings">Settings</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/help">Help & Support</Link>
+          <Link href="/patient/help">Help & Support</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer">Logout</DropdownMenuItem>

@@ -8,7 +8,9 @@ const {
   updateAppointment,
   findDoctor,
   doctorDetails,
-  uploadDocuments
+  uploadDocuments,
+  validateregistrationNumber,
+  searchDoctors
 } = require("../Controllers/Doctor.controller");
 const DoctorRouter = express.Router();
 const { authenticateToken  }= require("../Middlewares/JWT.authentication");
@@ -30,13 +32,14 @@ DoctorRouter.post("/user", register);
 DoctorRouter.post("/register", authenticateToken,DoctorAuth, doctorDetails)
 // Doctor Login
 DoctorRouter.post("/login", login);
+DoctorRouter.get("/search", searchDoctors);
 // Doctor Deletion
 DoctorRouter.delete("/deleteDoctor",authenticateToken,DoctorAuth, deleteDoctor);
 // Doctor Update
 DoctorRouter.put("/updateDoctor/:doctorId",authenticateToken, updateDoctor);
 // DoctorRouter.patch("/:doctorId",Auth,DoctorAuth, updateDoctor);
 // All Doctors Data
-DoctorRouter.get("/all",authenticateToken,getAllDoctors);
+DoctorRouter.get("/all",getAllDoctors);
 //find Doctor by id
 DoctorRouter.get("/:doctorId",authenticateToken, findDoctor);
 //only do changes in appoinment
@@ -49,5 +52,8 @@ DoctorRouter.post('/upload-documents',
   ]),
   authenticateToken,uploadDocuments,
 );
+
+DoctorRouter.post("/validate-reg-no",authenticateToken,validateregistrationNumber)
+
 
 module.exports = DoctorRouter;

@@ -235,10 +235,11 @@ const findDoctor = async (req, res) => {
 // Controller function for getting all doctors
 const getAllDoctors = async (req, res) => {
     try {
-        
         const doctors = await prisma.doctor.findMany();
+        // console.log(doctors.firstName);
         
-        res.status(200).json({ doctors: doctors });
+        
+        res.status(200).json(doctors);
     } catch (error) {
         // Handle errors and send an error response
         console.error(error);
@@ -264,6 +265,55 @@ const uploadDocuments = async (req,res) => {
         res.status(500).json({error:"Failed to upload documents"})
     }
 };
+
+const validateregistrationNumber = async (req,res) => {
+    const {registrationNumber} = req.body
+
+    try {
+        const validRegNo = prisma.doctor.findUnique({
+            where:{
+                registrationNumber: registrationNumber
+            },
+        })
+    
+        if (!validRegNo) {
+            return res.status(404).json("Provide valid reg no");
+        }else{
+            return res.status(200).json(validRegNo);
+        }
+    } catch (error) {
+        res.status(500).json({error:"Something went wrong"})
+    }
+}
+
+const searchDoctors = async (req,res) => {
+
+    const { query} = req.query;
+
+    try {
+        const doctors = await prisma.doctor.findMany({
+            where:{
+                OR:[
+                    {firstName:{contains:query, lte:'insensitive'}},
+                    {lastName:{contains:query, lte:'insensitive'}},
+                    {specialization:{contains:query, lte:'insensitive'}}
+                ]
+            },
+            // select: {
+            //     firstName: true,
+            //     lastName: true,
+            //     email: true,
+            //     phone: true,
+            //     specialization: true
+            // },
+        })
+
+        res.status(200).json(doctors);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({error: "Failed to search doctors"});
+    }
+}
 
 // Controller function for updating an appointment
 // const updateAppointment = async (req, res) => {
@@ -301,5 +351,7 @@ module.exports = {
     getAllDoctors,
     // updateAppointment,
     uploadDocuments,
-    doctorDetails
+    doctorDetails,
+    validateregistrationNumber,
+    searchDoctors
 };

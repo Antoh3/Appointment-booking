@@ -2,11 +2,13 @@ const prisma = require("../prisma/prismaClient");
 
 // Create a new appointment
 const createAppointment = async (req, res) => {
+
     if (req.userRole !== 'patient') {
         return res.status(403).json({ message: 'Access forbidden' });
     }
 
-    const { doctorId, schedule, reason, primaryPhysician } = req.body
+    const { doctorId, schedule, reason } = req.body
+
     const patientId = req.userId;
     console.log("user id is ", patientId);
 
@@ -38,7 +40,7 @@ const createAppointment = async (req, res) => {
                 schedule: new Date(schedule),
                 reason,
                 status: "scheduled",
-                primaryPhysician,
+                // primaryPhysician,
                 patientName: patient.name,
                 patientId: patient.id,
                 doctorId: doctor.id

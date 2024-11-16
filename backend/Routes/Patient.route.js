@@ -41,7 +41,7 @@ PatientRouter.post("/register",authenticateToken,registerPatient);
 PatientRouter.post("/user", registerUser)
 // Login a patient
 PatientRouter.post("/login", loginPatient);
-PatientRouter.get("/search/doctor", authenticateToken,searchDoctors)
+PatientRouter.get("/search",searchDoctors)
 // Get a patient by ID
 PatientRouter.get("/patient",authenticateToken, getPatientById);
 // Update a patient by ID

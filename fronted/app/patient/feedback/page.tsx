@@ -3,7 +3,7 @@ import SiteHeader from "@/components/patient/SiteHeader";
 import SiteShell from "@/components/patient/SiteShell";
 
 export const metadata = {
-  title: "Journal",
+  title: "Feedback",
 };
 
 const JournalPage = () => {

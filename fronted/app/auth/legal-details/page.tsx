@@ -6,19 +6,40 @@ import {FaEnvelope, FaIdBadge} from "react-icons/fa6";
 import Link from "next/link";
 import LegalDocsUpload from "@/app/auth/uploads/LegalDocsUpload";
 import {useRouter} from "next/navigation";
+import createAxiosInstance from "@/app/context/axiosInstance";
+import { message } from "antd";
+import { AxiosError } from "axios";
 
-export default function LegalDetails() {
+export default async function LegalDetails() {
     const router = useRouter();
+    const axiosInstance = createAxiosInstance();
+
     const {control, handleSubmit} = useForm({
         defaultValues: {
             registrationNumber: "",
-            idNumber: "",
         },
     })
 
-    const onSubmit: SubmitHandler<any> = (data) => {
-        console.log(data)
-        router.push("/patient")
+    const onSubmit: SubmitHandler<any> = async (data) => {
+       try {
+        const response = await axiosInstance.post('/doctor/validate-reg-no', data)
+
+        if (response?.status === 200) {
+            message.success("successfully uploaded");
+            console.log(data)
+            router.push("/patient")
+        }
+       } catch (error) {
+        if (error instanceof AxiosError) {
+            if (error.response?.status === 404) {
+                message.error("Provide valid registration number");
+            }
+        }else{
+            message.error("An error occurred. Please try again later.");
+            console.error("Error during uploading legal : ", error);
+        }
+       }
+        
     }
 
     return (
@@ -47,7 +68,7 @@ export default function LegalDetails() {
                     }
                 />
 
-                <Controller
+                {/* <Controller
                     name="idNumber"
                     control={control}
                     render={({field}) =>
@@ -60,7 +81,7 @@ export default function LegalDetails() {
                                startContent={<FaIdBadge/>}
                         />
                     }
-                />
+                /> */}
 
                 <LegalDocsUpload/>
                 <Button type="submit" className="bg-primary text-white w-full mt-4">Finish</Button>
