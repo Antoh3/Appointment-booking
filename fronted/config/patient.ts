@@ -16,8 +16,8 @@ export const patientConfig: PatientConfig = {
           icon: "calendar",
         },
         {
-          title: "Prescription records",
-          href: "/patient/prescriptions",
+          title: "Ambulance Requests",
+          href: "/patient/ambulance",
           icon: "prescription",
         },
         {

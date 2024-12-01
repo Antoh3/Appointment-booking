@@ -7,6 +7,7 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
 };
 
 declare type Gender = 'Male' | 'Female';
+declare type AppointmentStatus = 'scheduled' | 'approved' | 'canceled'
 declare type Status = "In Progress" | "Scheduled" | "Cancelled" | "Pending" | "Complete" | "Issued" | "Not Issued";
 
 export type SidebarNavItem = {

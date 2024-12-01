@@ -10,10 +10,13 @@ export const metadata = {
 
 const AppointmentsPage = () => {
   return (
-    <SiteShell>
-      <SiteHeader heading="Appointments" />
-      <AppointmentForm />
-      <SearchBar placeholder="search appointments....."/>
+    <SiteShell >
+      <div className="flex justify-between">
+        <SiteHeader heading="Appointments" />
+        <AppointmentForm />
+      </div>
+      <p>Don't forget to provide how your are felling in the Addditional Info page</p>
+      <SearchBar placeholder="search appointments....." />
       <AppointmentsColumns />
     </SiteShell>
   );

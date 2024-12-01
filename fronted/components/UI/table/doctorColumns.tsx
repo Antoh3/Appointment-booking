@@ -28,7 +28,7 @@ const DoctorColumns = () => {
     await axiosInstance
       .get("/doctor/all")
       .then((response) => {
-        // console.log(response.data.doctor);
+        // console.log(response.data);
         setData(response.data);
       })
       .catch((error) => {

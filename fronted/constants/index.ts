@@ -16,3 +16,9 @@ export const statusIcon = {
   Issued: FaCheck,
   "Not Issued": FaRegHourglass,
 };
+
+export const appointmentIcon ={
+  scheduled : FaRegHourglass,
+  approved: FaCheck,
+  canceled: IoWarningOutline
+}

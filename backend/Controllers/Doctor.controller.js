@@ -294,9 +294,9 @@ const searchDoctors = async (req,res) => {
         const doctors = await prisma.doctor.findMany({
             where:{
                 OR:[
-                    {firstName:{contains:query, lte:'insensitive'}},
-                    {lastName:{contains:query, lte:'insensitive'}},
-                    {specialization:{contains:query, lte:'insensitive'}}
+                    {firstName:{contains:query}},
+                    {lastName:{contains:query}},
+                    {specialization:{contains:query}}
                 ]
             },
             // select: {

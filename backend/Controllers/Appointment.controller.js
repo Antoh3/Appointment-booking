@@ -29,19 +29,22 @@ const createAppointment = async (req, res) => {
                 id: patientId
             }
         })
-        console.log("patient name", patient.name);
+        // console.log(`Patient name ${patient.firstName} ${patient.lastName}`);
         if (!patient) {
             return res.status(404).json({ message: "Please login" })
         }
 
+        const name = `${patient.firstName}-${patient.lastName}`
+        // console.log("Patient name",name);
+        
 
         const appoinment = await prisma.appointment.create({
             data: {
                 schedule: new Date(schedule),
                 reason,
-                status: "scheduled",
+                status: "approved",
                 // primaryPhysician,
-                patientName: patient.name,
+                patientName: name,
                 patientId: patient.id,
                 doctorId: doctor.id
             }
@@ -65,7 +68,7 @@ const getDoctorAppointmentById = async (req, res) => {
 
         const doctor = await prisma.doctor.findUnique({
             where: {
-                userId: req.userId
+                id: req.userId
             }
         })
         console.log(doctor.id);
@@ -108,7 +111,7 @@ const getPatientAppointmentById = async (req, res) => {
 
         const user = await prisma.patient.findUnique({
             where: {
-                userId: patientId
+                id: patientId
             }
         })
         if (!user) {
@@ -121,7 +124,6 @@ const getPatientAppointmentById = async (req, res) => {
             },
             select: {
                 schedule: true,
-                primaryPhysician: true,
                 reason: true,
                 patientName: true,
                 status: true
@@ -129,7 +131,7 @@ const getPatientAppointmentById = async (req, res) => {
         })
 
         // Send a success response with the appointment data
-        res.status(200).json({ appointments });
+        res.status(200).json(appointments);
     } catch (error) {
         // Handle errors and send an error response
         console.error(error);

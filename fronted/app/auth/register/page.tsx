@@ -1,343 +1,246 @@
 "use client";
-import React from "react";
-import {
-  Button,
-  DatePicker,
-  Input,
-  Select,
-  SelectItem,
-} from "@nextui-org/react";
-import { Controller, useForm } from "react-hook-form";
+
 import Link from "next/link";
-import {
-  FaArrowRightLong,
-  FaCalendarDays,
-  FaEnvelope,
-  FaIdBadge,
-  FaLocationDot,
-  FaLock,
-  FaPhone,
-  FaRegAddressCard,
-} from "react-icons/fa6";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { zodResolver } from "@hookform/resolvers/zod";
-import axios, { AxiosError } from "axios";
-import { LuLoader2 } from "react-icons/lu";
+import VerifyLocation from "@/components/VerifyLocation";
+import { motion } from "framer-motion";
 import { message } from "antd";
+import { BiSolidRightArrow, BiSolidLeftArrow } from "react-icons/bi";
+import { FaUserPlus } from "react-icons/fa";
+import Image from "next/image";
 
-import { genderOptions } from "@/constants";
-import { registerUserForm, registerUserSchema } from "@/lib/validators/auth";
+import { useState, useEffect } from "react";
 
-export default function Register() {
-  const router = useRouter();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<registerUserForm>({
-    resolver: zodResolver(registerUserSchema),
-  });
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+function Register() {
+    // State variables for user input
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [gender, setGender] = useState("male");
+    const [dob, setDob] = useState("");
+    const [inputEmail, setInputEmail] = useState("");
+    const [phone, setPhone] = useState(0);
+    const [password, setPassword] = useState("");
+    const [repeatPassword, setRepeatPassword] = useState("");
+    const [loc, setLoc] = useState();
+    const [currentStep, setCurrentStep] = useState(1); // Track the current form step
 
-  async function onSubmit(data: registerUserForm) {
-    setIsLoading(true);
+    const locationStatus = async () => {
+        await VerifyLocation()
+            .then((l: any) => setLoc(l))
+            .catch(async (e) => {
+                message.warning("Please allow location");
+                setTimeout(async () => {
+                    await VerifyLocation()
+                        .then((l: any) => setLoc(l))
+                        .catch((e) => {
+                            message.error(
+                                "Location is required to run the app. Please allow location!"
+                            );
+                        });
+                }, 3000);
+            });
+    };
 
-    // Extracting the date parts and converting it to a proper date string or object
-    const dateObj = data.birthDate;
+    // Function to validate basic details (called before moving to step 2)
+    const verifyBasicDetails = async () => {
+        await locationStatus();
 
-    // const year = dateObj.year;
-    // const month = String(dateObj.month).padStart(2, "0");
-    // const day = String(dateObj.day).padStart(2, "0");
-
-    // // Format as YYYY-MM-DD
-    // const formattedDate = `${year}-${month}-${day}`;
-    const formattedDate = `${dateObj.year}-${dateObj.month}-${dateObj.day}`;
-
-    data.birthDate = formattedDate;
-
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/patient/user",
-        data,
-      );
-
-      if (response?.status === 200) {
-        message.success("Registration successful.");
-        console.log("Registration successful: ", response.data.user);
-        router.push("/auth/login");
-      }
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        if (err.response?.status === 400) {
-          message.error("Patient already exists.");
-          console.log("Patient already exists: ", err.response.data.message);
+        if (firstName === "") {
+            message.warning("First name is empty");
+            return false;
         }
-      } else {
-        message.error("An error occurred. Please try again later.");
-        console.error("Error during registration: ", err);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }
+        if (lastName === "") {
+            message.warning("Last name is empty");
+            return false;
+        }
+        if (
+            dob === "" ||
+            Number(dob.substring(0, 4)) > 2007 // Year format check
+        ) {
+            message.warning("Age should be at least 15 years");
+            return false;
+        }
+        return true;
+    };
 
-  // const onSubmit: SubmitHandler<any> = (data) => {
-  //   console.log(data);
-  //   router.push("/auth/legal-details");
-  // };
+    // Handle form submission (signup)
+    const signupUser = async () => {
+        if (!await verifyBasicDetails()) {
+            message.error("Something went wrong!");
+            return false;
+        }
 
-  return (
-    <>
-      <div className="flex flex-col space-y-2 text-center">
-        <Image
-          alt="logo"
-          className="mx-auto mb-2"
-          height={200}
-          src="/dokta-logo.svg"
-          width={50}
-        />
-        <h1 className="header">Welcome 👋</h1>
-        <p className="text-dark-700">Let us know more about yourself.</p>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Create Account
-        </h1>
-      </div>
+        // Email validation using regular expression
+        const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (!emailRegex.test(inputEmail)) {
+            message.error("Invalid email address");
+            return false;
+        }
 
-      <form
-        className="w-full flex flex-col gap-4"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <Controller
-          control={control}
-          defaultValue=""
-          name="email"
-          render={({ field }) => (
-            <div>
-              <Input
-                {...field}
-                color="primary"
-                label="Email"
-                placeholder="example@mail.com"
-                startContent={<FaEnvelope />}
-                type="email"
-                variant="bordered"
-              />
-              {errors.email && (
-                <p className="px-1 text-sm text-red-600">
-                  {errors.email.message}
-                </p>
-              )}
+        // Phone number validation (optional)
+        // if (phone < 3000000000 || phone > 3999999999) {
+        //   message.error("Invalid phone number");
+        //   return false;
+        // }
+
+        if (password === "" || repeatPassword === "") {
+            message.warning("Password is empty");
+            return false;
+        }
+        if (password !== repeatPassword) {
+            message.error("Password mismatch");
+            return false;
+        }
+        if (password.length < 8) {
+            message.error("Password length must be greater than 7");
+            return false;
+        }
+
+        // Handle signup logic here (e.g., call an API to create a user)
+        console.log("Signup details:", {
+            firstName,
+            lastName,
+            gender,
+            dob,
+            email: inputEmail,
+            phone,
+            password,
+        });
+
+        // Reset form state after successful signup (optional)
+        // setFirstName("");
+        // // ... reset other fields
+    };
+
+    // Handle "Next" button click
+    const handleNext = async () => {
+        if (currentStep === 1 && !(await verifyBasicDetails())) {
+            return; // Prevent going to step 2 if validation fails
+        }
+        setCurrentStep(currentStep + 1);
+    };
+
+    // Handle "Previous" button click
+    const handlePrevious = () => {
+        setCurrentStep(currentStep - 1);
+    };
+
+    return (
+        <>
+            <div >
+                <div className="">
+                    <div className="signup_container">
+                        <div className="flex flex-col space-y-2 text-center">
+                            <Image
+                                alt="logo"
+                                className="mx-auto mb-2"
+                                height={200}
+                                src="/dokta-logo.svg"
+                                width={50}
+                            />
+                            <h2 className="header">Hello 👋</h2>
+                            {/* <p className="text-dark-700">Let us know more about yourself.</p> */}
+                            <h1 className="text-2xl font-semibold tracking-tight">
+                                SignUp
+                            </h1>
+                        </div>
+
+                        {currentStep === 1 && (
+                            <div id="signup_container_1">
+                                <p>First Name:</p>
+                                <input
+                                    type="text"
+                                    placeholder="Enter your first name"
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                    value={firstName} // Set initial value
+                                />
+                                <p>Last Name:</p>
+                                <input
+                                    type="text"
+                                    placeholder="Enter your last name"
+                                    onChange={(e) => setLastName(e.target.value)}
+                                    value={lastName} // Set initial value
+                                />
+                                <p>Gender:</p>
+                                <select defaultValue={gender} onChange={(e) => setGender(e.target.value)}>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+
+                                <p>Birthday:</p>
+                                <input
+                                    type="date"
+                                    placeholder="Enter your birthday"
+                                    onChange={(e) => setDob(e.target.value)}
+                                    value={dob}
+                                />
+
+                                <motion.button
+                                    onClick={handleNext}
+                                    whileTap={{ scale: 0.9 }}
+                                    style={{ display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "center" }}
+                                >
+                                    Next <BiSolidRightArrow />
+                                </motion.button>
+                            </div>
+                        )}
+
+                        {currentStep === 2 && (
+                            <div id="signup_container_3" style={{ display: 'block' }}>
+                                <p>Email:</p>
+                                <input
+                                    type="email"
+                                    placeholder="Enter your email address"
+                                    onChange={(e) => setInputEmail(e.target.value)}
+                                    value={inputEmail} // Set initial value
+                                />
+                                <p>Phone Number:</p>
+                                <input
+                                    type="number"
+                                    placeholder="e.g 03181236267"
+                                    onChange={(e: any) => setPhone(e.target.value)}
+                                    value={phone}
+                                />
+
+                                <p>Password:</p>
+                                <input
+                                    type="password"
+                                    placeholder="Enter strong password"
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    value={password} // Set initial value
+                                />
+                                <p>Repeat Password:</p>
+                                <input
+                                    type="password"
+                                    placeholder="Enter strong password"
+                                    onChange={(e) => setRepeatPassword(e.target.value)}
+                                    value={repeatPassword} // Set initial value
+                                />
+
+                                <motion.button
+                                    onClick={handlePrevious}
+                                    whileTap={{ scale: 0.9 }}
+                                    id="previous"
+                                    style={{ display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "center" }}
+                                >
+                                    <BiSolidLeftArrow /> Previous
+                                </motion.button>
+
+                                <motion.button
+                                    onClick={signupUser}
+                                    whileTap={{ scale: 0.9 }}
+                                    style={{ display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "center" }}
+                                >
+                                    Signup <FaUserPlus />
+                                </motion.button>
+                            </div>
+                        )}
+
+                        <Link href={"/auth/login"}>Already have an account? Signin using this link</Link>
+                    </div>
+                </div>
             </div>
-          )}
-        />
-
-        <Controller
-          control={control}
-          defaultValue=""
-          name="idNumber"
-          render={({ field }) => (
-            <div>
-              <Input
-                {...field}
-                color="primary"
-                label="ID Number"
-                placeholder="Enter ID number"
-                startContent={<FaRegAddressCard />}
-                type="text"
-                variant="bordered"
-              />
-              {errors.idNumber && (
-                <p className="px-1 text-sm text-red-600">
-                  {errors.idNumber.message}
-                </p>
-              )}
-            </div>
-          )}
-        />
-        <div className="flex flex-row justify-between gap-2">
-          <Controller
-            control={control}
-            defaultValue=""
-            name="firstName"
-            render={({ field }) => (
-              <div>
-                <Input
-                  {...field}
-                  color="primary"
-                  label="First name"
-                  placeholder="Enter your first name"
-                  startContent={<FaIdBadge />}
-                  type="text"
-                  variant="bordered"
-                />
-                {errors.firstName && (
-                  <p className="px-1 text-sm text-red-600">
-                    {errors.firstName.message}
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
-          <Controller
-            control={control}
-            defaultValue=""
-            name="lastName"
-            render={({ field }) => (
-              <div>
-                <Input
-                  {...field}
-                  color="primary"
-                  label="Last name"
-                  placeholder="Enter your last name"
-                  startContent={<FaIdBadge />}
-                  type="text"
-                  variant="bordered"
-                />
-                {errors.lastName && (
-                  <p className="px-1 text-sm text-red-600">
-                    {errors.lastName.message}
-                  </p>
-                )}
-              </div>
-            )}
-          />
-        </div>
-
-        <Controller
-          control={control}
-          name="birthDate"
-          render={({ field }) => (
-            <DatePicker
-              {...field}
-              color="primary"
-              errorMessage="Please enter a valid date."
-              label="Date of Birth"
-              startContent={<FaCalendarDays className="text-black" />}
-              variant="bordered"
-            />
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="gender"
-          render={({ field }) => (
-            <div>
-              <Select
-                {...field}
-                className=""
-                color="primary"
-                label="Gender"
-                placeholder="Select gender"
-                startContent={<FaIdBadge />}
-                variant="bordered"
-              >
-                {genderOptions.map((gender) => (
-                  <SelectItem key={gender.key}>{gender.label}</SelectItem>
-                ))}
-              </Select>
-              {errors.idNumber && (
-                <p className="px-1 text-sm text-red-600">
-                  {errors.idNumber.message}
-                </p>
-              )}
-            </div>
-          )}
-        />
-
-        <Controller
-          control={control}
-          defaultValue=""
-          name="password"
-          render={({ field }) => (
-            <div>
-              <Input
-                {...field}
-                className="mt-2"
-                color="primary"
-                label="Password"
-                placeholder="Enter a strong password"
-                startContent={<FaLock />}
-                type="password"
-                variant="bordered"
-              />
-              {errors.password && (
-                <p className="px-1 text-sm text-red-600">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-          )}
-        />
-
-        <Controller
-          control={control}
-          defaultValue=""
-          name="permanentLocation"
-          render={({ field }) => (
-            <div>
-              <Input
-                {...field}
-                color="primary"
-                label="Permanent location"
-                placeholder="Enter your permanent location"
-                startContent={<FaLocationDot />}
-                type="text"
-                variant="bordered"
-              />
-              {errors.permanentLocation && (
-                <p className="px-1 text-sm text-red-600">
-                  {errors.permanentLocation.message}
-                </p>
-              )}
-            </div>
-          )}
-        />
-        <Controller
-          control={control}
-          defaultValue=""
-          name="phoneNumber"
-          render={({ field }) => (
-            <div>
-              <Input
-                {...field}
-                color="primary"
-                label="Phone"
-                placeholder="070..."
-                startContent={<FaPhone />}
-                type="phone"
-                variant="bordered"
-              />
-              {errors.phoneNumber && (
-                <p className="px-1 text-sm text-red-600">
-                  {errors.phoneNumber.message}
-                </p>
-              )}
-            </div>
-          )}
-        />
-
-        <Button
-          className="bg-primary text-white w-full mt-4"
-          disabled={isLoading}
-          endContent={
-            isLoading ? (
-              <LuLoader2 className="animate-spin" />
-            ) : (
-              <FaArrowRightLong />
-            )
-          }
-          type="submit"
-        >
-          Create account
-        </Button>
-      </form>
-      <Link className="text-center" href={"/auth/login"}>
-        Already have an account?{" "}
-        <span className="font-bold text-primary">Login</span>
-      </Link>
-    </>
-  );
+        </>
+    );
 }
+
+export default Register;
