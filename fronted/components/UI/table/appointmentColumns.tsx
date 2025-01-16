@@ -17,7 +17,7 @@ interface Appointments {
 
 const AppointmentsColumns = () => {
   const [data, setData] = useState<Appointments[]>([]);
-  console.log(data);
+  // console.log(data);
   
   const axiosInstance = createAxiosInstance();
 

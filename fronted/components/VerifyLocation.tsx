@@ -1,4 +1,4 @@
-const VerifyLocation = async() => {
+const VerifyLocation = async(): Promise<[number,number]> => {
   return new Promise((resolve,reject)=>{
         navigator.geolocation.getCurrentPosition(
             (position)=>{

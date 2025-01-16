@@ -75,7 +75,7 @@ const menuItems = [
 
 export function AppSidebar() {
   return (
-    <main className="w-[200px] 2xl:w-[250px] bg-white h-full border-e">
+    <main className="w-[200px] 2xl:w-[250px] bg-white h-full  fixed border-e bg-green-400">
       <div className="flex gap-2 items-center px-4 py-4">
         <Image
           alt="logo"

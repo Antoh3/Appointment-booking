@@ -20,7 +20,7 @@ const AppNav = ({ items }: PatientNavProps) => {
   }
 
   return (
-    <nav className="grid items-start gap-2">
+    <nav className="grid items-start gap-2 fixed">
       <div className="flex flex-row items-center border-b h-16 cursor-pointer">
         <Image
           alt="logo"
@@ -40,7 +40,7 @@ const AppNav = ({ items }: PatientNavProps) => {
             <div key={index} className="mt-4">
               <h3 className="pl-3 mb-2 text-medium font-semibold text-gray-500">{item.title}</h3>
               <div className="">
-                {item.items.map((subItem, subIndex) => {
+                {item.items.map((subItem:any, subIndex:any) => {
                   const SubIcon = Icons[subItem.icon || "arrowRight"];
                   return (
                     subItem.href && (

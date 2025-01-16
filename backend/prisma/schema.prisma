@@ -14,8 +14,6 @@ model User {
   phone    String
   password String
   role     Role
-
-
 }
 
 model Patient {
@@ -27,7 +25,7 @@ model Patient {
   birthDate         String
   gender            String
   idNumber          String
-  permanentLocation String
+  permanentLocation Json
   password          String
   createdAt         DateTime @default(now())
   role              Role     @default(patient)
@@ -36,22 +34,23 @@ model Patient {
 
   feedback Feedback[]
 
-
   doctorId String?
   doctor   Doctor? @relation(fields: [doctorId], references: [id])
+
+  requests AmbulanceRequest[]
 }
 
 model Doctor {
   id                 String  @id @unique @default(uuid())
   firstName          String
   lastName           String
-  email              String @unique
+  email              String  @unique
   phone              String
   gender             String
   specialization     String
   licenseNumber      String
   registrationNumber String
-  password String
+  password           String
   idFront            String?
   idBack             String?
   certificate        String?
@@ -59,7 +58,6 @@ model Doctor {
 
   appointments Appointment[]
   patients     Patient[]
-
 }
 
 model Appointment {
@@ -80,19 +78,37 @@ model Appointment {
 }
 
 model Ambulance {
-  id            String @id @unique @default(uuid())
+  id            String          @id @unique @default(uuid())
   name          String
   licenseNumber String
-  location      String
-  onwer         String
+  location      Json
+  type          String
+  owner         String
+  status        AmbulanceStatus @default(available)
+
+  requests AmbulanceRequest[]
+}
+
+model AmbulanceRequest {
+  id            String        @id @unique @default(uuid())
+  aidCarType    String
+  selectedItems Json
+  createdAt     DateTime      @default(now())
+  status        RequestStatus @default(pending)
+
+  patientId   String
+  ambulanceId String?
+
+  ambulance Ambulance? @relation(fields: [ambulanceId], references: [id])
+  patient   Patient    @relation(fields: [patientId], references: [id])
 }
 
 model Feedback {
   id      String @id @unique @default(uuid())
   content String
-  
-  userId  String
-  user    Patient   @relation(fields: [userId], references: [id])
+
+  userId String
+  user   Patient @relation(fields: [userId], references: [id])
 }
 
 enum Role {
@@ -105,4 +121,24 @@ enum Status {
   scheduled
   approved
   canceled
+}
+
+enum AmbulanceStatus {
+  available
+  assinged
+  on_route
+  mantainace
+}
+
+enum RequestStatus {
+  pending
+  accepted
+  completed
+}
+
+enum AmbulanceType {
+  Basic
+  Advanced
+  Motuary
+  Patient
 }

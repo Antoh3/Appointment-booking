@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE `Patient` ADD COLUMN `certificate` VARCHAR(191) NULL,
-    ADD COLUMN `idBack` VARCHAR(191) NULL,
-    ADD COLUMN `idFront` VARCHAR(191) NULL;

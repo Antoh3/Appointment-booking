@@ -55,7 +55,7 @@ export default function HomePage() {
           <Table
             aria-label="Example static collection table"
             removeWrapper
-            className="bg-white rounded-lg border p-2"
+            className="bg-white rounded-lg border p-2 ml-5"
           >
             <TableHeader className="!bg-none">
               <TableColumn>Patient Name</TableColumn>

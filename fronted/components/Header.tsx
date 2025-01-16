@@ -1,6 +1,7 @@
 "use client";
 import { motion } from 'framer-motion'
 import { FaUser } from 'react-icons/fa';
+import Link from 'next/link';
 
 function Header() {
     return (
@@ -16,7 +17,7 @@ function Header() {
                         whileTap={{ scale: 0.8 }}
                         style={{ display: "flex", alignItems: "center", gap: "0.5rem" }} 
                     >
-                        Login <FaUser />
+                        <Link href={"/auth/login"}>Login</Link><FaUser />
                     </motion.li>
                 </ul>
             </div>

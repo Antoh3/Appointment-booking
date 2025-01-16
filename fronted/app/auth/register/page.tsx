@@ -7,54 +7,95 @@ import { message } from "antd";
 import { BiSolidRightArrow, BiSolidLeftArrow } from "react-icons/bi";
 import { FaUserPlus } from "react-icons/fa";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 
 import { useState, useEffect } from "react";
+import axios, { AxiosError } from "axios";
+// import { number } from "zod";
+
+
 
 function Register() {
-    // State variables for user input
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [gender, setGender] = useState("male");
-    const [dob, setDob] = useState("");
-    const [inputEmail, setInputEmail] = useState("");
-    const [phone, setPhone] = useState(0);
-    const [password, setPassword] = useState("");
-    const [repeatPassword, setRepeatPassword] = useState("");
-    const [loc, setLoc] = useState();
-    const [currentStep, setCurrentStep] = useState(1); // Track the current form step
+    const [loc, setLoc] = useState([0, 0]);
+    const location = `${loc[0]},${loc[1]}`;
+   
+    // console.log(location);
+    // console.log(`The location values are ${loc[0]} and ${loc[1]}`);
+    const [formData, setFormData] = useState({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phoneNumber: "",
+        birthDate: "",
+        gender: "",
+        idNumber: "",
+        permanentLocation: [0,0],
+        password: "",
+    });
+    console.log(formData);
+    const [currentStep, setCurrentStep] = useState(1); 
+    const router = useRouter();
+
+
+     const userLocation = {
+        permanentLocation:loc
+    }
+    // console.log("I changed locatio to", formData.permanentLocation);
+
 
     const locationStatus = async () => {
         await VerifyLocation()
-            .then((l: any) => setLoc(l))
+            .then((l: [number, number]) => {
+                setLoc(l);
+                setFormData((prevState:any) => ({
+                    ...prevState,
+                    permanentLocation:l,
+                }))
+                console.log("The location is ", l);
+            })
             .catch(async (e) => {
                 message.warning("Please allow location");
-                setTimeout(async () => {
-                    await VerifyLocation()
-                        .then((l: any) => setLoc(l))
-                        .catch((e) => {
-                            message.error(
-                                "Location is required to run the app. Please allow location!"
-                            );
-                        });
-                }, 3000);
+                // setTimeout(async () => {
+                await VerifyLocation()
+                    .then((l: any) => setLoc(l))
+                    .catch((e) => {
+                        message.error(
+                            "Location is required to run the app. Please allow location!"
+                        );
+                    });
+                // }, 3000);
             });
     };
+
+    const handleInputChange = async (e: any) => {
+        let formEvent = e;
+        setFormData((prevState:any)=>{
+            // console.log("The name is",formEvent.target.name)
+            // if(formEvent.target.name === "permanentLocation"){
+            //     console.log(formEvent.target.value.split(', '))
+            //     return {...prevState, [formEvent.target.name]: formEvent.target.value.split(', ') }
+            // }else{
+                return {...prevState, [formEvent.target.name]: formEvent.target.value}
+            // }
+        })
+    }
 
     // Function to validate basic details (called before moving to step 2)
     const verifyBasicDetails = async () => {
         await locationStatus();
 
-        if (firstName === "") {
+        if (formData.firstName === "") {
             message.warning("First name is empty");
             return false;
         }
-        if (lastName === "") {
+        if (formData.lastName === "") {
             message.warning("Last name is empty");
             return false;
         }
         if (
-            dob === "" ||
-            Number(dob.substring(0, 4)) > 2007 // Year format check
+            formData.birthDate === "" ||
+            Number(formData.birthDate.substring(0, 4)) > 2007 // Year format check
         ) {
             message.warning("Age should be at least 15 years");
             return false;
@@ -64,6 +105,7 @@ function Register() {
 
     // Handle form submission (signup)
     const signupUser = async () => {
+        // setTimeout( async () =>{
         if (!await verifyBasicDetails()) {
             message.error("Something went wrong!");
             return false;
@@ -71,7 +113,7 @@ function Register() {
 
         // Email validation using regular expression
         const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-        if (!emailRegex.test(inputEmail)) {
+        if (!emailRegex.test(formData.email)) {
             message.error("Invalid email address");
             return false;
         }
@@ -82,34 +124,43 @@ function Register() {
         //   return false;
         // }
 
-        if (password === "" || repeatPassword === "") {
-            message.warning("Password is empty");
-            return false;
-        }
-        if (password !== repeatPassword) {
-            message.error("Password mismatch");
-            return false;
-        }
-        if (password.length < 8) {
+        if (formData.password.length < 8) {
             message.error("Password length must be greater than 7");
             return false;
         }
+        // },3000)
 
-        // Handle signup logic here (e.g., call an API to create a user)
-        console.log("Signup details:", {
-            firstName,
-            lastName,
-            gender,
-            dob,
-            email: inputEmail,
-            phone,
-            password,
-        });
 
-        // Reset form state after successful signup (optional)
-        // setFirstName("");
-        // // ... reset other fields
+        try {
+            const response = await axios.post(
+                "http://localhost:5000/patient/user",
+                formData,
+                // userLocation,
+            );
+
+            // console.log(response.data);
+
+
+            if (response?.status === 200) {
+                message.success("Registration successful.");
+                console.log("Registration successful: ", response.data.user);
+                router.push("/auth/login");
+            }
+        } catch (err) {
+            if (err instanceof AxiosError) {
+                if (err.response?.status === 400) {
+                    message.error("Patient already exists.");
+                    console.log("Patient already exists: ", err.response.data.message);
+                }
+            } else {
+                message.error("An error occurred. Please try again later.");
+                console.error("Error during registration: ", err);
+            }
+        }
+
     };
+
+
 
     // Handle "Next" button click
     const handleNext = async () => {
@@ -117,6 +168,7 @@ function Register() {
             return; // Prevent going to step 2 if validation fails
         }
         setCurrentStep(currentStep + 1);
+        console.log("next");
     };
 
     // Handle "Previous" button click
@@ -150,18 +202,26 @@ function Register() {
                                 <input
                                     type="text"
                                     placeholder="Enter your first name"
-                                    onChange={(e) => setFirstName(e.target.value)}
-                                    value={firstName} // Set initial value
+                                    name="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleInputChange}
+                                // Set initial value
                                 />
                                 <p>Last Name:</p>
                                 <input
                                     type="text"
                                     placeholder="Enter your last name"
-                                    onChange={(e) => setLastName(e.target.value)}
-                                    value={lastName} // Set initial value
+                                    name="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleInputChange}
+                                // Set initial value
                                 />
                                 <p>Gender:</p>
-                                <select defaultValue={gender} onChange={(e) => setGender(e.target.value)}>
+                                <select
+                                    name="gender"
+                                    // defaultValue={formData.gender}
+                                    value={formData.gender}
+                                    onChange={handleInputChange}>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
                                 </select>
@@ -170,14 +230,27 @@ function Register() {
                                 <input
                                     type="date"
                                     placeholder="Enter your birthday"
+                                    name="birthDate"
+                                    value={formData.birthDate}
+                                    onChange={handleInputChange}
+                                />
+                                {/* <p>Permanet Location:</p>
+                                <input
+                                    type="date"
+                                    placeholder="Enter your birthday"
                                     onChange={(e) => setDob(e.target.value)}
                                     value={dob}
-                                />
+                                /> */}
 
                                 <motion.button
                                     onClick={handleNext}
                                     whileTap={{ scale: 0.9 }}
-                                    style={{ display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "center" }}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "0.5rem",
+                                        justifyContent: "center"
+                                    }}
                                 >
                                     Next <BiSolidRightArrow />
                                 </motion.button>
@@ -190,37 +263,55 @@ function Register() {
                                 <input
                                     type="email"
                                     placeholder="Enter your email address"
-                                    onChange={(e) => setInputEmail(e.target.value)}
-                                    value={inputEmail} // Set initial value
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                // Set initial value
                                 />
                                 <p>Phone Number:</p>
                                 <input
-                                    type="number"
-                                    placeholder="e.g 03181236267"
-                                    onChange={(e: any) => setPhone(e.target.value)}
-                                    value={phone}
+                                    type="tel"
+                                    placeholder="e.g 07181236267"
+                                    name="phoneNumber"
+                                    value={formData.phoneNumber}
+                                    onChange={handleInputChange}
                                 />
 
                                 <p>Password:</p>
                                 <input
                                     type="password"
                                     placeholder="Enter strong password"
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    value={password} // Set initial value
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                // Set initial value
                                 />
-                                <p>Repeat Password:</p>
+                                <p>idNumber:</p>
                                 <input
-                                    type="password"
-                                    placeholder="Enter strong password"
-                                    onChange={(e) => setRepeatPassword(e.target.value)}
-                                    value={repeatPassword} // Set initial value
+                                    type="number"
+                                    placeholder="Enter idNumber"
+                                    name="idNumber"
+                                    value={formData.idNumber}
+                                    onChange={handleInputChange}
+                                // Set initial value
+                                />
+
+                                <input
+                                    name="permanentLocation"
+                                    value={formData.permanentLocation.join(", ")}
+                                    hidden
                                 />
 
                                 <motion.button
                                     onClick={handlePrevious}
                                     whileTap={{ scale: 0.9 }}
                                     id="previous"
-                                    style={{ display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "center" }}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "0.5rem",
+                                        justifyContent: "center"
+                                    }}
                                 >
                                     <BiSolidLeftArrow /> Previous
                                 </motion.button>
@@ -228,14 +319,19 @@ function Register() {
                                 <motion.button
                                     onClick={signupUser}
                                     whileTap={{ scale: 0.9 }}
-                                    style={{ display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "center" }}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "0.5rem",
+                                        justifyContent: "center"
+                                    }}
                                 >
                                     Signup <FaUserPlus />
                                 </motion.button>
                             </div>
                         )}
 
-                        <Link href={"/auth/login"}>Already have an account? Signin using this link</Link>
+                        <Link href={"/auth/login"}>Already have an account? SignIn</Link>
                     </div>
                 </div>
             </div>

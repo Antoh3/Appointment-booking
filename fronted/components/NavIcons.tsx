@@ -7,11 +7,13 @@ import {
   FiArrowRight,
 } from "react-icons/fi";
 import { LiaAllergiesSolid } from "react-icons/lia";
-import { FaPrescription } from "react-icons/fa";
+import { FaPrescription,FaAmbulance } from "react-icons/fa";
 import { TbLogout2 } from "react-icons/tb";
+import { BsFillChatRightDotsFill } from "react-icons/bs";
 
 export const Icons = {
   calendar: FiCalendar,
+  feedback:BsFillChatRightDotsFill,
   help: FiHelpCircle,
   home: FiHome,
   settings: FiSettings,
@@ -19,5 +21,6 @@ export const Icons = {
   allergies: LiaAllergiesSolid,
   prescription: FaPrescription,
   arrowRight: FiArrowRight,
+  ambulance:FaAmbulance,
   logout: TbLogout2,
 };

@@ -8,6 +8,9 @@ const registerUser = async (req, res) => {
                 gender,idNumber,permanentLocation,password
          } = req.body;
 
+         console.log(req.body);
+         
+
         const existingUser = await prisma.patient.findUnique({
             where: {
                 email: email,
@@ -32,8 +35,12 @@ const registerUser = async (req, res) => {
             },
         });
 
+        console.log(newUser);
+        
         // const token = generateToken(newUser)
         res.status(200).json({newUser,message:"User registered"});
+        // console.log(newUser);
+        
     } catch (error) {
         console.error(error)
         res.status(500).json({ message: "Internal server error" })
@@ -163,7 +170,7 @@ const loginPatient = async (req, res) => {
         const accessToken = generateToken(user.id, 'patient');
         const refreshToken = generateRefreshToken(user.id, 'patient')
         
-        console.log(accessToken);
+        // console.log(accessToken);
         
         //Set tokens in response headers
         res.setHeader('Authorization', `Bearer ${accessToken}`);

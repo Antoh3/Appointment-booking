@@ -16,9 +16,9 @@ export const patientConfig: PatientConfig = {
           icon: "calendar",
         },
         {
-          title: "Ambulance Requests",
+          title: "Request AidCar",
           href: "/patient/ambulance",
-          icon: "prescription",
+          icon: "ambulance",
         },
         {
           title: "Appointments",
@@ -33,7 +33,7 @@ export const patientConfig: PatientConfig = {
         {
           title: "FeedBack",
           href: "/patient/feedback",
-          icon: "calendar",
+          icon: "feedback",
         },
         // {
         //   title: "Allergies",

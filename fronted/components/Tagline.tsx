@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 function Tagline() {
 
@@ -9,7 +10,7 @@ function Tagline() {
             <div className="tagline_text">
                 <h1>Kenya's first <br /><b>Emergency Response</b></h1>
                 <p>Emergency car, just a tap away</p>
-                <motion.button whileTap={{ scale: 0.8 }}>Signup for free!</motion.button>
+                <motion.button whileTap={{ scale: 0.8 }}><Link href={"/auth/register"}>Signup for free!</Link></motion.button>
             </div>
             <div className="tagline_ambulance">
                 <motion.img
