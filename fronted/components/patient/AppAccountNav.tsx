@@ -34,7 +34,7 @@ export function AppAccountNav() {
           <Link href="/patient/services">Services</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/patient/ambulance">Ambulance Requests</Link>
+          <Link href="/patient/ambulance">Request Aid Car</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/patient/appointments">Appointments</Link>

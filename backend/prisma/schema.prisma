@@ -17,18 +17,19 @@ model User {
 }
 
 model Patient {
-  id                String   @id @unique @default(uuid())
+  id                String        @id @unique @default(uuid())
   firstName         String
   lastName          String
-  email             String   @unique
+  email             String        @unique
   phoneNumber       String
   birthDate         String
   gender            String
   idNumber          String
   permanentLocation Json
   password          String
-  createdAt         DateTime @default(now())
-  role              Role     @default(patient)
+  createdAt         DateTime      @default(now())
+  role              Role          @default(patient)
+  status            PatientStatus @default(active)
 
   appointments Appointment[]
 
@@ -121,6 +122,7 @@ enum Status {
   scheduled
   approved
   canceled
+  completed
 }
 
 enum AmbulanceStatus {
@@ -134,6 +136,12 @@ enum RequestStatus {
   pending
   accepted
   completed
+}
+
+enum PatientStatus {
+  active
+  scheduled
+  followeup
 }
 
 enum AmbulanceType {

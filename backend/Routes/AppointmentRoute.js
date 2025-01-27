@@ -5,8 +5,8 @@ const {
   updateAppointmentById,
   deleteAppointmentById,
   getPatientAppointmentById,
-  getDoctorAppointmentById
-} = require("../Controllers/Appointment.controller");
+  getDoctorAppointmentById,
+} = require("../Controllers/AppointmentController");
 const Auth = require("../Middlewares/JWT.authentication");
 
 // Create a new appointment

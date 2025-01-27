@@ -18,18 +18,41 @@ const upload = multer({ storage });
 
 
 // Controller function for doctor registration
-const register = async (req, res) => {
+const registerDoctor = async (req, res) => {
     try {
+        const {firstName,lastName,phone,gender,email,
+            specialization,licenseNumber,
+            registrationNumber} = req.body;
+
         // Check if the email already exists in the database
-        const existingDoctor = await prisma.user.findUnique({
+        const existingDoctor = await prisma.doctor.findUnique({
             where: {
-                email: req.body.email
+                email: email
             }
         });
-
         if (existingDoctor) {
             return res.status(400).json({ message: 'Email already exists!', status: false });
         }
+
+        // const existingLicencseNumber = await prisma.doctor.findUnique({
+        //     where:{
+        //         licenseNumber:licenseNumber
+        //     }
+        // })
+        // if (existingLicencseNumber) {
+        //     return  res.status(400).json({message:"License number already taken"})
+        // }
+
+        // const existingRegistrationNumber = await prisma.doctor.findUnique({
+        //     where:{
+        //         registrationNumber: registrationNumber
+        //     }
+        // })
+        // if (existingRegistrationNumber) {
+        //     return res.status(400).json({message:"user with the registrationnumber exists"})
+        // }
+
+        
 
         // If the email is not found, proceed with registration logic   
 
@@ -40,7 +63,14 @@ const register = async (req, res) => {
         // Proceed with registration logic
         const newDoctor = await prisma.doctor.create({
             data: {
-                ...req.body,
+                firstName,
+                lastName,
+                phone,
+                gender,
+                email,
+                specialization,
+                licenseNumber,
+                registrationNumber,
                 password: hashedPassword
             }
         });
@@ -344,7 +374,7 @@ const searchDoctors = async (req,res) => {
 
 module.exports = {
     findDoctor,
-    register,
+    registerDoctor,
     login,
     deleteDoctor,
     updateDoctor,

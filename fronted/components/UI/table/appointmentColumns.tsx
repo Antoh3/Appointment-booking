@@ -20,7 +20,6 @@ const AppointmentsColumns = () => {
   // console.log(data);
   
   const axiosInstance = createAxiosInstance();
-
   const fetchAppointments = async () => {
     await axiosInstance
     .get("/appointment/patient")

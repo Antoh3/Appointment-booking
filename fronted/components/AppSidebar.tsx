@@ -20,12 +20,12 @@ const menuItems = [
         link: "/app",
       },
       {
-        title: "Diagnosis",
+        title: "Patient Diagnostics",
         icon: <FiCalendar />,
         link: "/app/diagnosis",
       },
       {
-        title: "Prescription records",
+        title: "Patient Prescriptions",
         icon: <FaPrescription />,
         link: "/app/prescriptions",
       },
@@ -35,24 +35,14 @@ const menuItems = [
         link: "/app/appointments",
       },
       {
-        title: "Lab Test Results",
+        title: "Patients",
         icon: <FiUsers />,
         link: "/app/lab-results",
       },
       {
-        title: "Journal",
+        title: "Patient Notes",
         icon: <FiCalendar />,
         link: "/app/journal",
-      },
-      {
-        title: "Triage",
-        icon: <FiCalendar />,
-        link: "/app/triage",
-      },
-      {
-        title: "Allergies",
-        icon: <LiaAllergiesSolid />,
-        link: "/app/allergies",
       },
     ],
   },
@@ -75,8 +65,8 @@ const menuItems = [
 
 export function AppSidebar() {
   return (
-    <main className="w-[200px] 2xl:w-[250px] bg-white h-full  fixed border-e bg-green-400">
-      <div className="flex gap-2 items-center px-4 py-4">
+    <main className="w-[200px] 2xl:w-[250px]  h-full  fixed border-e">
+      <div className="flex flex-row items-center border-b h-16 cursor-pointer">
         <Image
           alt="logo"
           className="w-8 2xl:w-10"

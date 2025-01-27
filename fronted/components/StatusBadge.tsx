@@ -9,10 +9,12 @@ const StatusBadge = ({ status }: { status: Status }) => {
     switch (status) {
       case "Scheduled":
       case "Complete":
+      case "Completed":
       case "Issued":
         return "text-green-500";
       case "In Progress":
       case "Pending":
+      case "Accepted":
       case "Not Issued":
         return "text-blue-500";
       case "Cancelled":
@@ -24,7 +26,7 @@ const StatusBadge = ({ status }: { status: Status }) => {
   return (
     <div
       className={clsx("status-badge", {
-        "bg-green-600/20": status === "Scheduled" || status === "Complete" || status === "Issued",
+        "bg-green-600/20": status === "Scheduled" || status === "Complete" || status === "Issued" ,
         "bg-blue-600/20": status === "In Progress" || status === "Pending" || status === "Not Issued",
         "bg-red-600/20": status === "Cancelled",
       })}

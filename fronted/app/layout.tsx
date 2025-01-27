@@ -45,7 +45,9 @@ export default function RootLayout({
       >
         <AuthProvider>
           <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
+            <div className="flex flex-col gap-4 mx-0 px-0 w-full">
             {children}
+            </div>
           </Providers>
         </AuthProvider>
       </body>

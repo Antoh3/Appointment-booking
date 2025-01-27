@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  register,
+  registerDoctor,
   login,
   deleteDoctor,
   updateDoctor,
@@ -11,7 +11,7 @@ const {
   uploadDocuments,
   validateregistrationNumber,
   searchDoctors
-} = require("../Controllers/Doctor.controller");
+} = require("../Controllers/DoctorController");
 const DoctorRouter = express.Router();
 const { authenticateToken  }= require("../Middlewares/JWT.authentication");
 const { DoctorAuth } = require("../Middlewares/RoleBased.authentication");
@@ -28,8 +28,8 @@ const upload = multer({
 })
 
 // Doctor Registration
-DoctorRouter.post("/user", register);
-DoctorRouter.post("/register", authenticateToken,DoctorAuth, doctorDetails)
+DoctorRouter.post("/register", registerDoctor);
+// DoctorRouter.post("/register", authenticateToken,DoctorAuth, doctorDetails)
 // Doctor Login
 DoctorRouter.post("/login", login);
 DoctorRouter.get("/search", searchDoctors);

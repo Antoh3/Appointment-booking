@@ -21,7 +21,7 @@ import { FaArrowRightToBracket } from "react-icons/fa6";
 
 export default function Login() {
   const router = useRouter();
-  const { setTokens } = useAuth();
+  const { setAuth } = useAuth();
   const axiosInstance = createAxiosInstance()
 
   const {
@@ -41,8 +41,8 @@ export default function Login() {
         "/patient/login",
         data
       );
-      const { accessToken, refreshToken } = response.data;
-      setTokens(accessToken, refreshToken);
+      const { accessToken} = response.data;
+      setAuth(accessToken);
 
       if (response?.status === 200) {
         message.success("Login successful.");

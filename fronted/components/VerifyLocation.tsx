@@ -1,3 +1,5 @@
+import { message } from "antd"
+
 const VerifyLocation = async(): Promise<[number,number]> => {
   return new Promise((resolve,reject)=>{
         navigator.geolocation.getCurrentPosition(
@@ -5,7 +7,7 @@ const VerifyLocation = async(): Promise<[number,number]> => {
                 resolve([position.coords.latitude,position.coords.longitude])
             },
             (error) =>{
-              reject(false)
+              reject(message.error("Unable to access location please enable location"));
             }
         )
   })

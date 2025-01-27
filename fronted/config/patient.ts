@@ -35,11 +35,11 @@ export const patientConfig: PatientConfig = {
           href: "/patient/feedback",
           icon: "feedback",
         },
-        // {
-        //   title: "Allergies",
-        //   href: "/patient/allergies",
-        //   icon: "allergies",
-        // },
+        {
+          title: "TrackAmbulance",
+          href: "/patient/track",
+          icon: "allergies",
+        },
         {
           title: "Additional Info",
           href: "/patient/additionalInfo",

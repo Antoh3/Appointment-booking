@@ -65,9 +65,14 @@ function Ambulanceform() {
                 if (error.response?.status === 404) {
                     message.error("No available ambulances");
                 }
-
                 if (error.response?.status === 401) {
                     message.error("Login first")
+                }
+                if (error.response?.status === 403) {
+                    message.error("You must be logged first")
+                }
+                if(error.response?.status === 400){
+                    message.error("No available ambulances near you");
                 }
             }else{
                 console.error(error)

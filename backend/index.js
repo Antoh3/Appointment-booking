@@ -4,9 +4,9 @@ const cors = require('cors');
 const morgan = require('morgan');
 const compression = require('compression');
 
-const DoctorRouter = require('./Routes/Doctor.route');
-const PatientRouter = require('./Routes/Patient.route');
-const AppointmentRouter = require('./Routes/Appointment.route');
+const DoctorRouter = require('./Routes/DoctorRoute');
+const PatientRouter = require('./Routes/PatientRoute');
+const AppointmentRouter = require('./Routes/AppointmentRoute');
 const AdminRouter = require('./Routes/Admin.route');
 const TokenRouter = require('./Routes/Token');
 const AmbulanceRouter = require('./Routes/AmbulanceRoute');

@@ -8,7 +8,7 @@ const registerUser = async (req, res) => {
                 gender,idNumber,permanentLocation,password
          } = req.body;
 
-         console.log(req.body);
+        //  console.log(req.body);
          
 
         const existingUser = await prisma.patient.findUnique({
@@ -19,7 +19,9 @@ const registerUser = async (req, res) => {
         if (existingUser) {
             return res.status(400).json({ message: 'Email already exists!', status: false });
         }
-        const hashedPassword = await bcrypt.hash(password, 20)
+
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds)
 
         const newUser = await prisma.patient.create({
             data: {
@@ -35,7 +37,7 @@ const registerUser = async (req, res) => {
             },
         });
 
-        console.log(newUser);
+        // console.log(newUser);
         
         // const token = generateToken(newUser)
         res.status(200).json({newUser,message:"User registered"});
@@ -140,12 +142,54 @@ const registerPatient = async (req, res) => {
     }
 };
 
+const loginPatient1 = async (req, res) => {
+    const { email, password } = req.body;
+    console.log("in patient");
+
+    try {
+        const start = Date.now();
+
+        // Query patient by email
+        const patient = await prisma.patient.findUnique({ where: { email } });
+        console.log(`Database query took ${Date.now() - start}ms`);
+
+        if (!patient) {
+            return res.status(400).json({ message: 'User not found!' });
+        }
+
+        // Compare password
+        const hashStart = Date.now();
+        const isPasswordValid = await bcrypt.compare(password, patient.password);
+        console.log(`Password comparison took ${Date.now() - hashStart}ms`);
+
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: 'Invalid credentials!' });
+        }
+
+        // Generate tokens
+        const tokenStart = Date.now();
+        const accessToken = generateToken(patient.id, 'patient');
+        const refreshToken = generateRefreshToken(patient.id, 'patient');
+        console.log(`Token generation took ${Date.now() - tokenStart}ms`);
+
+        res.status(200).json({
+            message: "Login successful",
+            accessToken,
+            refreshToken,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
 
 
 // Controller function for patient login
 const loginPatient = async (req, res) => {
+    const { email, password } = req.body;
+
     try {
-        const { email, password } = req.body;
 
         // Find the user by email
         const user = await prisma.patient.findUnique({
@@ -154,8 +198,6 @@ const loginPatient = async (req, res) => {
             },
         });
         
-        
-
         // Check if the user exists
         if (!user) {
             return res.status(400).json({ message: 'User not found!' });
@@ -169,15 +211,6 @@ const loginPatient = async (req, res) => {
 
         const accessToken = generateToken(user.id, 'patient');
         const refreshToken = generateRefreshToken(user.id, 'patient')
-        
-        // console.log(accessToken);
-        
-        //Set tokens in response headers
-        res.setHeader('Authorization', `Bearer ${accessToken}`);
-        res.setHeader('x-refresh-token', refreshToken);
-        // res.header('x-access-token', accessToken);
-        // res.header('x-refresh-token', refreshToken);
-        // console.log(req.userId,req.userRole);
         
         res.status(200).json({message: "Login succesfull",accessToken,refreshToken,});
     } catch (error) {
@@ -425,5 +458,6 @@ module.exports = {
     getPatientById,
     updatePatientById,
     deletePatientById,
-    updateAppointment
+    updateAppointment,
+    loginPatient1
 };

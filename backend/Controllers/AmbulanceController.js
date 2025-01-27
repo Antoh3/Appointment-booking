@@ -1,6 +1,7 @@
 const { warnEnvConflicts } = require("@prisma/client/runtime/library");
 const prisma = require("../prisma/prismaClient");
-const haversine = require("../Utils/calculateDistance")
+const haversine = require("../Utils/calculateDistance");
+const { default: axios } = require("axios");
 
 
 const ambulanceRequest = async (req, res) => {
@@ -36,7 +37,7 @@ const ambulanceRequest = async (req, res) => {
 
         const [patientLat, patientLng] = permanentLocation;
 
-        console.log(`Patient location is ${patientLat}, ${patientLng}`);
+        // console.log(`Patient location is ${patientLat}, ${patientLng}`);
 
         // Fetch available ambulances of the specified type
         const ambulances = await prisma.ambulance.findMany({
@@ -45,6 +46,8 @@ const ambulanceRequest = async (req, res) => {
                 status: 'available',
             },
         });
+        // console.log("Available ambulances",ambulances);
+
 
         if (!ambulances.length) {
             return res.status(404).json({ message: 'No ambulances available' });
@@ -172,16 +175,16 @@ const trackAmbulance = async (req, res) => {
             },
             include: {
                 ambulance: true,
-                patient:true,
+                patient: true,
             }
         })
-        
+
         const patient = await prisma.patient.findUnique({
-            where:{
-                id:patientId
+            where: {
+                id: patientId
             }
         })
-        
+
 
         if (!request || !request.ambulance) {
             res.status(404).json({ message: "Ambulance not found" });
@@ -190,11 +193,11 @@ const trackAmbulance = async (req, res) => {
         const { permanentLocation } = patient;
 
         const { location: ambulanceLocation } = request.ambulance;
-        console.log("ambulance location",ambulanceLocation);
-        
-        const [ patientLat, patientLng ] = permanentLocation;
-        console.log("Patient location",patientLat,patientLng);
-        
+        console.log("ambulance location", ambulanceLocation);
+
+        const [patientLat, patientLng] = permanentLocation;
+        console.log("Patient location", patientLat, patientLng);
+
 
         if (!ambulanceLocation || !patientLat || !patientLng) {
             res.status(404).json({ message: "Ambulance or patient location not found" });
@@ -219,7 +222,40 @@ const trackAmbulance = async (req, res) => {
             ambulanceLng,
         )
 
+        const getLocationName = async (latitude, longitude) => {
+            console.log("in geo location");
+
+            const API_KEY = 'AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao'; // Replace with your actual API key
+            const url = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyHvdSJ21dDHJhxVyW8Sb-CX77sLSM82UxT&libraries=geometry,places&callback=initMap`;
+
+            try {
+                const response = await axios.get(url);
+                console.log('Google Maps API response:', response.data); // Log the response for debugging
+
+                const results = response.data.results;
+
+                if (results && results.length > 0) {
+                    return results[0].formatted_address; // Return the first result's formatted address
+                }
+
+                return 'Unknown location'; // Return default message if no results found
+            } catch (error) {
+                console.error('Error fetching location name:', error.message);
+                return 'Unknown location'; // Return default message in case of an error
+            }
+        };
+
+
+        const ambulanceLocationName = await getLocationName(ambulanceLat, ambulanceLng);
+        const patientLoctionName = await getLocationName(patientLat, patientLng);
+
         res.status(200).json({
+            ambulanceLocation: {
+                address: ambulanceLocationName
+            },
+            patientLocation: {
+                address: patientLoctionName
+            },
             location: { latitude: ambulanceLat, longitude: ambulanceLng },
             distance: `${distance.toFixed(2)} Km`,
         })
@@ -228,8 +264,110 @@ const trackAmbulance = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+const getAllAmbulances = async (req, res) => {
+    const ambulances = await prisma.ambulance.findMany({
+        select: {
+            id: true,
+            name: true,
+            owner: true,
+            location: true,
+            type: true,
+            status: true
+        }
+    });
+
+    res.status(200).json(ambulances);
+}
+
+const getAllAmbulanceRequests = async (req, res) => {
+    const patientId = req.userId;
+
+    const user = await prisma.patient.findUnique({
+        where: {
+            id: patientId
+        }
+    })
+    if (!user) {
+        return res.status(404).json({message:"Login first"})
+    }
+    // const patientName = `${user.firstName}-${user.lastName}`
+    const requests = await prisma.ambulanceRequest.findMany({
+        where: {
+            patientId: patientId
+        },
+        select: {
+            aidCarType: true,
+            status: true,
+
+            ambulance:{
+                select:{
+                    owner:true,
+                    name:true
+                }
+            },
+
+            patient:{
+                select:{
+                    firstName:true,
+                    lastName:true
+                }
+            }
+        }
+    })
+
+    
+    return res.status(200).json(requests)
+}
+
+const getAmbulanceById = async (req, res) => {
+    const { ambulanceId } = req.params;
+
+    const ambulance = await prisma.ambulance.findUnique({
+        where: {
+            id: ambulanceId
+        }
+    })
+
+    res.status(200).json(ambulance);
+}
+
+const updateAmbulance = async (req, res) => {
+    const { name, licenseNumber, location, type, owner, status } = req.body;
+    const { ambulanceId } = req.params;
+
+    const ambulance = await prisma.ambulance.findUnique({
+        where: {
+            id: ambulanceId
+        }
+    });
+
+    if (!ambulance) {
+        res.status(404).json({ message: "Ambulance not available" })
+    }
+
+    const updatedAmbulance = await prisma.ambulance.update({
+        where: {
+            id: ambulanceId
+        },
+        data: {
+            name: name,
+            licenseNumber: licenseNumber,
+            location: location,
+            type: type,
+            owner: owner,
+            status: status,
+        }
+    });
+
+    res.status(201).json(updatedAmbulance)
+}
 module.exports = {
     ambulanceRequest,
     createAmbulance,
     trackAmbulance,
+    getAllAmbulances,
+    getAmbulanceById,
+    updateAmbulance,
+    getAllAmbulanceRequests,
 }

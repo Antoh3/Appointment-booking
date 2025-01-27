@@ -42,7 +42,7 @@ const createAppointment = async (req, res) => {
             data: {
                 schedule: new Date(schedule),
                 reason,
-                status: "approved",
+                status: "scheduled",
                 // primaryPhysician,
                 patientName: name,
                 patientId: patient.id,
@@ -123,10 +123,17 @@ const getPatientAppointmentById = async (req, res) => {
                 patientId: user.id
             },
             select: {
+                id:true,
                 schedule: true,
                 reason: true,
                 patientName: true,
-                status: true
+                status: true,
+                doctor:{
+                    select:{
+                        firstName:true,
+                        lastName:true
+                    }
+                }
             }
         })
 

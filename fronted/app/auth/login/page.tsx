@@ -11,7 +11,7 @@ import Image from "next/image";
 import createAxiosInstance from "@/app/context/axiosInstance";
 import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 
 function Login() {
 
@@ -23,7 +23,7 @@ function Login() {
         password: ""
     });
     const axiosInstance = createAxiosInstance();
-    const { setTokens } = useAuth();
+    const { setAuth } = useAuth();
     const router = useRouter();
 
     const handleInputChange = (event: any) => {
@@ -35,32 +35,38 @@ function Login() {
     // when user clicks on Login Button
     const loginUser = async () => {
         // setTimeout(() => {
-            // input validation 
-            if (formData.email === "" && formData.password !== "") {
-                message.error("Input correct password")
-                return
-            }
-            if (formData.email !== "" && formData.password === "") {
-                message.error("Input correct email")
-                return
-            }
-            if (formData.email === "" && formData.password === "") {
-                message.error("Input email and password")
-                return
-            }
-            let flag = true
-            if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(formData.email)) flag = false;
+        // input validation 
+        if (formData.email === "" && formData.password !== "") {
+            message.error("Input correct password")
+            return
+        }
+        if (formData.email !== "" && formData.password === "") {
+            message.error("Input correct email")
+            return
+        }
+        if (formData.email === "" && formData.password === "") {
+            message.error("Input email and password")
+            return
+        }
+        let flag = true
+        if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(formData.email)) flag = false;
 
-            if (flag) {
-                message.error("Invalid email address")
-                return
-            }
+        if (flag) {
+            message.error("Invalid email address")
+            return
+        }
         // }, 2000)
 
         try {
-            const response = await axiosInstance.post("/patient/login",formData);
-            const { accessToken, refreshToken} = response.data;
-            setTokens(accessToken,refreshToken);
+            const response = await axiosInstance.post("/patient/login", formData);
+            // const response = await axios.post("http://localhost:5000/patient/login",formData);
+            console.log(response.data);
+
+            const { accessToken, refreshToken } = response.data;
+
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
+            setAuth({ accessToken, refreshToken });
 
             if (response?.status === 200) {
                 message.success("Login successful.");
@@ -72,8 +78,10 @@ function Login() {
                 if (error.response?.status === 400) {
                     message.error("Invalid email or password");
                 }
-            }else{
+            } else {
                 message.error("An error occured");
+                console.log(error);
+
             }
         }
 

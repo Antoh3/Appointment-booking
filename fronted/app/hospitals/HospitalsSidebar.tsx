@@ -33,35 +33,35 @@ const menuItems = [
                 subMenu: true,
                 subMenuItems: [
                     {
-                        title: "Lab Requests",
+                        title: "All Requests",
                         link: "/hospitals/requests/lab"
                     },
                     {
-                        title: "patient requests",
+                        title: "pending requests",
                         link: "/hospitals/requests/patients"
                     },
-                    // {
-                    //     title: "Permission Requests",
-                    //     link: ""
-                    // }
+                    {
+                        title: "Completed  Requests",
+                        link: ""
+                    }
                     
                 ]
             },
-            {
-                title: "Refferals",
-                icon: <TbDirectionSign />,
-                link: "/hospitals/refferals"
-            },
+            // {
+            //     title: "Refferals",
+            //     icon: <TbDirectionSign />,
+            //     link: "/hospitals/refferals"
+            // },
             {
                 title: "Services",
                 icon: <MdOutlineInventory />,
                 link: "/hospitals/services"
             },
-            {
-                title: "Beds",
-                icon: <LuBedSingle />,
-                link: "/hospitals/beds"
-            }
+            // {
+            //     title: "Beds",
+            //     icon: <LuBedSingle />,
+            //     link: "/hospitals/beds"
+            // }
         ]
     },
     {

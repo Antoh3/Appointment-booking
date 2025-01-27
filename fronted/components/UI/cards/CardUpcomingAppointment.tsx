@@ -29,7 +29,7 @@ export const CardUpcomingAppointment = (props: Appointment) => {
     <div className="flex flex-col flex-wrap justify-between border rounded-lg w-full max-w-xl bg-white">
       <p className="p-4 border-b text-lg font-bold">Upcoming Appointment</p>
       <div className="p-4  flex flex-col gap-2 text-gray-600">
-        <DatePicker
+        {/* <DatePicker
           className="max-w-md"
           granularity="day"
           label={date.toDate().toDateString()}
@@ -38,7 +38,7 @@ export const CardUpcomingAppointment = (props: Appointment) => {
             setDate(e);
             // TODO: Update appointment api call
           }}
-        />
+        /> */}
         <div className="flex pt-2 gap-4 items-center">
           <TimeInput
             value={startTime}
@@ -75,13 +75,13 @@ export const CardUpcomingAppointment = (props: Appointment) => {
         </div>
       </div>
       <div className="p-4 border-t flex gap-4">
-        <Button variant="solid" color="primary" className="w-full">
+        {/* <Button variant="solid" color="primary" className="w-full">
           Confirm
-        </Button>
+        </Button> */}
         <Button
           variant="bordered"
           color="danger"
-          className="md:w-2/5 opacity-80"
+          className="md:w-full opacity-80 w-full bg-red-400/20"
         >
           Cancel
         </Button>

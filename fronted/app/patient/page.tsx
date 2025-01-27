@@ -1,4 +1,4 @@
-import HomePage from "@/app/app/(home)/HomePage";
+import HomePage from "@/app/patient/(home)/HomePage";
 import SiteHeader from "@/components/patient/SiteHeader";
 import SiteShell from "@/components/patient/SiteShell";
 

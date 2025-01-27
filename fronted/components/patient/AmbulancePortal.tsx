@@ -2,6 +2,7 @@
 
 import { Card, CardHeader, CardBody, CardFooter, Button } from "@nextui-org/react";
 import Ambulanceform from "./Ambulanceform";
+import TrackAmbulance from "./TrackAmbulance";
 
 const AmbulancePortal = () => {
     const emergencyCategories = [
@@ -19,7 +20,7 @@ const AmbulancePortal = () => {
                     image: "/media/M1.jpg",
                 },
                 {
-                    title: "Normal Calamity",
+                    title: "Normal Emergency",
                     description: "Stay safe by following fire safety guidelines.",
                     image: "/media/m3.avif",
                 },
@@ -44,7 +45,7 @@ const AmbulancePortal = () => {
                     image: "/media/n2.jpg",
                 },
                 {
-                    title: "Normal Calamity",
+                    title: "Normal Emergency",
                     description: "Stay safe by following fire safety guidelines.",
                     image: "/media/n3.jpg",
                 },
@@ -69,7 +70,7 @@ const AmbulancePortal = () => {
                     image: "/media/n2.jpg",
                 },
                 {
-                    title: "Normal Calamity",
+                    title: "Normal Emergency",
                     description: "Stay safe by following fire safety guidelines.",
                     image: "/media/n3.jpg",
                 },

@@ -143,26 +143,26 @@ const JournalTable = () => {
   const pages = Math.ceil(data.length / rowsPerPage);
 
   const paginatedJournals = useMemo(() => {
-      const start = (page - 1) * rowsPerPage;
-      const end = start + rowsPerPage;
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
 
-      return data.slice(start, end);
+    return data.slice(start, end);
   }, [page, data]);
 
   return (
     <div className="mt-8">
       <Table aria-label="Available journals" selectionMode="single" bottomContent={
         <div className="flex w-full justify-center">
-        <Pagination
-          isCompact
-          showControls
-          showShadow
-          color="primary"
-          page={page}
-          total={pages}
-          onChange={(page) => setPage(page)}
-        />
-      </div>
+          <Pagination
+            isCompact
+            showControls
+            showShadow
+            color="primary"
+            page={page}
+            total={pages}
+            onChange={(page) => setPage(page)}
+          />
+        </div>
       }>
         <TableHeader columns={columns}>
           {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}

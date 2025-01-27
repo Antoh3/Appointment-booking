@@ -1,6 +1,11 @@
 import { FaCheck } from "react-icons/fa";
 import { IoWarningOutline } from "react-icons/io5";
 import { FaRegHourglass } from "react-icons/fa6";
+// import { AiOutlineCheckCircle } from 'react-icons/i'
+import { FaRoute } from "react-icons/fa";
+import { MdAssignment } from "react-icons/md";
+import { IoAirplaneOutline } from "react-icons/io5";
+import { IoArchiveOutline } from "react-icons/io5";
 
 export const genderOptions = [
   { key: "Male", label: "Male" },
@@ -20,5 +25,13 @@ export const statusIcon = {
 export const appointmentIcon ={
   scheduled : FaRegHourglass,
   approved: FaCheck,
-  canceled: IoWarningOutline
+  canceled: IoWarningOutline,
+  Active: FaCheck,
+  Followedup: FaCheck,
+  available: IoAirplaneOutline,
+  assigned: MdAssignment,
+  on_route: FaRoute,
+  mantainance: IoArchiveOutline,
+  Completed: FaCheck,
+  pending: FaRegHourglass,
 }

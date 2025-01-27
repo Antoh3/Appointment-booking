@@ -79,9 +79,10 @@ function AppointmentForm() {
             }
         } catch (error) {
             if (error instanceof AxiosError) {
-               if (error.response?.status === 401) {
+               if (error.response?.status === 401 || error.response?.status === 403) {
                 message.warning("Please login first");
                }
+
             }else{
                 console.error('Error booking appointment:', error);
                 message.error("Try again later")

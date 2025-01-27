@@ -10,7 +10,7 @@ const PatientLayout = ({ children }: { children: React.ReactNode }) => {
           <AppNav items={patientConfig.sidebarNav} />
         </aside>
         <main className="flex w-full flex-1 flex-col overflow-hidden">
-          <header className="sticky top-0 z-40 border-b bg-background mb-8 bg-green-400">
+          <header className="sticky top-0 z-40 border-b bg-background mb-2 bg-green-400">
             <div className="container flex h-16 items-center justify-between py-4">
               <div className="text-xl font-bold">
                 Welcome Emmanuel
@@ -21,7 +21,9 @@ const PatientLayout = ({ children }: { children: React.ReactNode }) => {
               </div>
             </div>
           </header>
-          {children}
+          <div className="flex-grow bg-primary/5 p-8 ">
+            {children}
+          </div>
           {/* <SiteFooter className="border-t" /> */}
         </main>
       </div>

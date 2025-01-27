@@ -7,8 +7,9 @@ const {
   updatePatientById,
   deletePatientById,
   updateAppointment,
-  searchDoctors
-} = require("../Controllers/Patient.controller");
+  searchDoctors,
+  loginPatient1
+} = require("../Controllers/PatientController");
 const { authenticateToken  }= require("../Middlewares/JWT.authentication");
 const { PatientAuth } = require("../Middlewares/RoleBased.authentication");
 
@@ -41,6 +42,7 @@ PatientRouter.post("/register",authenticateToken,registerPatient);
 PatientRouter.post("/user", registerUser)
 // Login a patient
 PatientRouter.post("/login", loginPatient);
+PatientRouter.post("/login1", loginPatient1);
 PatientRouter.get("/search",searchDoctors)
 // Get a patient by ID
 PatientRouter.get("/patient",authenticateToken, getPatientById);

@@ -14,7 +14,7 @@ export default function Home() {
   // }, []);
 
   return (
-    <main className="flex flex-col gap-4 justify-center items-center h-screen">
+    <main className="flex flex-col mx-0 px-0 w-full gap-4 justify-center items-center h-screen">
       {/* <h1>Getting everything ready</h1>
       <Spinner />
       <Link className="text-blue-500" href="./auth">
