@@ -51,7 +51,7 @@ function Ambulanceform() {
                 selectedItems:selectedFeatures
             }
     
-            const response = await axiosInstance.post("http://localhost:5000/ambulance/requestambulance", formData)
+            const response = await axiosInstance.post("/ambulance/requestambulance", formData)
             if (response?.status === 201) {
                 message.success("Aid car on the way")
                 onClose();

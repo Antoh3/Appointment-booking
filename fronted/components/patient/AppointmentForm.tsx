@@ -40,7 +40,7 @@ function AppointmentForm() {
             return;
         }
         try {
-            const response = await axiosInstance.get(`http://localhost:5000/doctor/search?query=${query}`)
+            const response = await axiosInstance.get(`/doctor/search?query=${query}`)
             console.log("response data", response.data);
             // setDoctors(response.data);
             setFilteredDoctors(response.data);
@@ -123,8 +123,10 @@ function AppointmentForm() {
                                                         style={{
                                                             padding: '8px',
                                                             cursor: 'pointer',
-                                                            borderBottom: '1px solid #eee'
+                                                            borderBottom: '1px solid #eee',
+                                                            zIndex:"100"
                                                         }}
+                                                        
                                                     >
                                                         {doctor.firstName} {doctor.lastName} - {doctor.specialization}
                                                     </div>

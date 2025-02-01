@@ -3,6 +3,8 @@ const { PrismaClient } = require('@prisma/client');
 const cors = require('cors');
 const morgan = require('morgan');
 const compression = require('compression');
+const hhtp = require('http')
+
 
 const DoctorRouter = require('./Routes/DoctorRoute');
 const PatientRouter = require('./Routes/PatientRoute');
@@ -10,6 +12,7 @@ const AppointmentRouter = require('./Routes/AppointmentRoute');
 const AdminRouter = require('./Routes/Admin.route');
 const TokenRouter = require('./Routes/Token');
 const AmbulanceRouter = require('./Routes/AmbulanceRoute');
+const MessageRouter = require('./Routes/MessageRoute')
 
 const prisma = new PrismaClient({
     log: ['query', 'info', 'warn', 'error'],
@@ -45,6 +48,7 @@ app.use("/appointment", AppointmentRouter);
 app.use("/admin", AdminRouter);
 app.use("/token", TokenRouter);
 app.use("/ambulance", AmbulanceRouter);
+app.use("/api",MessageRouter);
 
 
 

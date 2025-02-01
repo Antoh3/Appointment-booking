@@ -9,12 +9,17 @@ import {
   TableHeader,
   TableRow,
   Button,
+  Pagination
 } from "@nextui-org/react";
 import StatusBadge from "@/components/StatusBadge";
 import { Tooltip } from "@nextui-org/react";
 import { FaCheck } from "react-icons/fa";
 import { IoWarningOutline } from "react-icons/io5";
-import { RiDeleteBin6Line, RiEdit2Line,RiLoopRightFill } from "react-icons/ri";
+import { RiDeleteBin6Line, RiEdit2Line, RiLoopRightFill } from "react-icons/ri";
+import { useEffect, useState, useMemo } from "react";
+import { AppointmentStatus } from "@/types";
+import createAxiosInstance from "@/app/context/axiosInstance";
+import AppointmentStatusBadge from "@/components/AppointmentStatusBadge";
 
 const patients = [
   {
@@ -43,44 +48,104 @@ const patients = [
   },
 ];
 
+interface Appointment {
+  id?: string;
+  schedule: string;
+  reason: string;
+  patientName: string;
+  status: AppointmentStatus;
+  doctor: {
+    firstName: string,
+    lastName: string,
+  }
+}
+
 export default function page() {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const axiosInstance = createAxiosInstance();
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 10;
+  console.log("in appointments");
+
+  // console.log("All appointments",appointments);
+
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    await axiosInstance
+      .get("/appointment/doctor")
+      .then((response) => {
+        setAppointments(response.data);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }
+
+  const pages = Math.ceil(appointments.length / rowsPerPage);
+  const paginatedAppointments = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return appointments.slice(start, end);
+  }, [page, appointments]);
+
   return (
     <main className="flex flex-col gap-4">
       <h1 className="text-3xl font-bold">Appointments</h1>
 
-      <div className="flex flex-col gap-8 flex-wrap items-start ">
-        <div className="grid md:grid-cols-4 gap-8 flex-wrap w-full">
+      <div className="flex flex-col gap-4 flex-wrap items-start ">
+        <div className="grid md:grid-cols-3 gap-8 flex-wrap w-full">
           <CardSummary title="Total Appointments" value="50" />
           <CardSummary title="Pending Appointments" value="20" />
           <CardSummary title="Rescheduled Appointments" value="20" />
-          <CardSummary title="Cancelled Appointments" value="5" />
+          {/* <CardSummary title="Cancelled Appointments" value="5" /> */}
         </div>
 
         <Table
           aria-label="Example static collection table"
           removeWrapper
-          className="bg-white rounded-lg border p-2"
-        >
+          className="bg-white rounded-lg border p-2 "
+          selectionMode="single" bottomContent={
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="primary"
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
+            </div>
+          }>
           <TableHeader className="!bg-none">
-            <TableColumn>Practitioner</TableColumn>
-            <TableColumn>Appointment Date</TableColumn>
-            <TableColumn>Status</TableColumn>
-            <TableColumn>Duration</TableColumn>
-            <TableColumn>Time</TableColumn>
+            <TableColumn>PatientName</TableColumn>
+            <TableColumn>Scheduled Date & time</TableColumn>
+            <TableColumn>Reason</TableColumn>
+            <TableColumn>status</TableColumn>
+            {/* <TableColumn>Time</TableColumn> */}
             <TableColumn>Action</TableColumn>
           </TableHeader>
-          <TableBody>
-            {patients?.map((item: any, i: number) => (
+          <TableBody items={paginatedAppointments} emptyContent={"No appointments yet."}>
+            {appointments?.map((item: any, i: number) => (
               <TableRow key={i}>
-                <TableCell>{item?.name}</TableCell>
-                <TableCell>{item?.appointmentDate}</TableCell>
+                <TableCell>{item?.patientName}</TableCell>
+                <TableCell>{item?.schedule}</TableCell>
+                <TableCell>{item?.reason}</TableCell>
                 <TableCell>
-                  <span className="min-w-[115px]">
-                    <StatusBadge status={item?.status} />
+                  <span
+                    className={
+                      "rounded w-full block text-center"
+                    }
+                  >
+                    <AppointmentStatusBadge status={item?.status} />
                   </span>
                 </TableCell>
-                <TableCell>{item?.duration}</TableCell>
-                <TableCell>{item?.time}</TableCell>
                 <TableCell >
                   <Tooltip showArrow={true} color="success" content="Approve Appointment" placement="top-start">
                     <Button
@@ -111,7 +176,7 @@ export default function page() {
                       isIconOnly
                       // color="danger"
                       aria-label="Cancel Appointment"
-                      className="m-1 bg-red-600/20"
+                      className="m-1 bg-red-500"
                     // disabled={deleting}
                     // onClick={() => handleDeleteJournal(item.id)}
                     >

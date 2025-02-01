@@ -52,12 +52,12 @@ const menuItems = [
       {
         title: "Settings",
         icon: <FiSettings />,
-        link: "",
+        link: "/app/settings",
       },
       {
         title: "Help & Support",
         icon: <FiHelpCircle />,
-        link: "",
+        link: "/app/help",
       },
     ],
   },

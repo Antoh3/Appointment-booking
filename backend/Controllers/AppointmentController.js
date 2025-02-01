@@ -62,7 +62,7 @@ const createAppointment = async (req, res) => {
 const getDoctorAppointmentById = async (req, res) => {
     try {
         if (req.userRole !== "doctor") {
-            return res.status(403).json({ message: "Acess forbidden only doctors can access" })
+            return res.status(403).json({ message: "Access forbidden only doctors can access" })
         }
         console.log(req.userId);
 
@@ -81,13 +81,13 @@ const getDoctorAppointmentById = async (req, res) => {
                 doctorId: doctor.id
             },
             select: {
-                // id: true,
+                id: true,
                 schedule: true,
                 status: true,
-                primaryPhysician: true,
+                // primaryPhysician: true,
                 patientName: true,
                 reason: true,
-                cancelationReason: true
+                // cancelationReason: true
             },
             orderBy: {
                 schedule: "asc"
@@ -134,6 +134,9 @@ const getPatientAppointmentById = async (req, res) => {
                         lastName:true
                     }
                 }
+            },
+            orderBy:{
+                schedule:'asc'
             }
         })
 

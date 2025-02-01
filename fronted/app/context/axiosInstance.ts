@@ -8,7 +8,7 @@ const createAxiosInstance = () => {
     const { auth, setAuth } = useAuth();
 
     const axiosInstance = axios.create({
-        baseURL: "http://localhost:5000",
+        baseURL: "http://localhost:5001",
     });
 
     // Attach access token to every request
@@ -47,7 +47,7 @@ const createAxiosInstance = () => {
                         throw new Error("No refresh token available");
                     }
 
-                    const response = await axios.post("http://localhost:5000/token/refreshToken", {}, {
+                    const response = await axios.post("http://localhost:5001/token/refreshToken", {}, {
                         headers: {
                             'x-refresh-token': refreshToken,
                         },

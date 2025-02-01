@@ -31,7 +31,7 @@ function AppointmentForm() {
 
     const handleSearchDoctors = async (query) => {
         try {
-            const response = await axiosInstance.get(`http://localhost:5000/doctor/search?query=${query}`)
+            const response = await axiosInstance.get(`/doctor/search?query=${query}`)
             setDoctors(response.data);
         } catch (error) {
             console.error("Error in fetching doctors", error);

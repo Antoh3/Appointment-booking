@@ -200,6 +200,8 @@ const loginPatient = async (req, res) => {
         
         // Check if the user exists
         if (!user) {
+            console.log("user not found");
+            
             return res.status(400).json({ message: 'User not found!' });
         }
 
@@ -208,6 +210,7 @@ const loginPatient = async (req, res) => {
         if (!isPasswordValid) {
             return res.status(400).json({ message: 'Invalid credentials!' });
         }
+        
 
         const accessToken = generateToken(user.id, 'patient');
         const refreshToken = generateRefreshToken(user.id, 'patient')

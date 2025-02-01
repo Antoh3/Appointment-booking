@@ -33,7 +33,7 @@ function Register() {
         permanentLocation: [0,0],
         password: "",
     });
-    console.log(formData);
+    // console.log(formData);
     const [currentStep, setCurrentStep] = useState(1); 
     const router = useRouter();
 
@@ -133,7 +133,7 @@ function Register() {
 
         try {
             const response = await axios.post(
-                "http://localhost:5000/patient/user",
+                "http://localhost:5001/patient/user",
                 formData,
                 // userLocation,
             );
@@ -222,6 +222,7 @@ function Register() {
                                     // defaultValue={formData.gender}
                                     value={formData.gender}
                                     onChange={handleInputChange}>
+                                    <option>select gender....</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
                                 </select>
