@@ -452,6 +452,86 @@ const updatePatientById = async (req, res) => {
     }
 };
 
+const cancelAppointment = async (req,res) => {
+    const { appointmentId } = req.params;
+    const {cancelationReason} = req.body
+
+    const appoinment = await prisma.appointment.findUnique({
+        where:{
+            id:appointmentId
+        }
+    })
+
+    if (!appoinment) {
+        res.json(404).json({message: "AppointmentId not found"});
+    }
+
+    const updatedAppointment = await prisma.appointment.update({
+        where:{
+            id:appointmentId
+        },
+        data:{
+            status:"canceled",
+            cancelationReason,
+        }
+    })
+
+    res.status(200).json(updatedAppointment);
+}
+
+const cancelRequest = async (req,res) => {
+    const { ambulanceRequestId } = req.params;
+    const { status } = req.body;
+
+    const ambulanceRequest = await prisma.ambulanceRequest.findUnique({
+        where:{
+            id: ambulanceRequestId
+        }
+    })
+
+    if (!ambulanceRequest) {
+        return res.status(404).json({message: "RequestId not found"})
+    }
+
+    const updatedRequest = await prisma.ambulanceRequest.update({
+        where:{
+            id:ambulanceRequestId
+        },
+        data:{
+            status:'canceled'
+        }
+    })
+    res.status(200).json(updatedRequest)
+}
+
+const rescheduleAppointment = async (req,res) => {
+    const { appointmentId } = req.params;
+    const { schedule } = req.body;
+
+
+    const findAppintment = await prisma.appointment.findUnique({
+        where:{
+            id:appointmentId
+        }
+    })
+
+    if (!findAppintment) {
+        return res.status(404).json({message:"appintmentId not found"});
+    }
+
+    const updatedAppointment = await prisma.appointment.update({
+        where:{
+            id:appointmentId
+        },
+        data:{
+            schedule: new Date(schedule),
+            status:'rescheduled'
+        }
+    })
+    return res.status(200).json(updatedAppointment)
+}
+
+
 
 module.exports = {
     searchDoctors,
@@ -462,5 +542,8 @@ module.exports = {
     updatePatientById,
     deletePatientById,
     updateAppointment,
-    loginPatient1
+    loginPatient1,
+    cancelAppointment,
+    cancelRequest,
+    rescheduleAppointment
 };

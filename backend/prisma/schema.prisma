@@ -143,6 +143,7 @@ enum Role {
 
 enum Status {
   scheduled
+  rescheduled
   approved
   canceled
   completed
@@ -158,6 +159,7 @@ enum AmbulanceStatus {
 enum RequestStatus {
   pending
   accepted
+  canceled
   completed
 }
 

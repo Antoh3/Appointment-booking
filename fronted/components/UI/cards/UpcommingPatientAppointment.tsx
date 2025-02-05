@@ -6,8 +6,12 @@ import { useMemo, useState } from "react";
 import { Time, ZonedDateTime } from "@internationalized/date";
 
 type Appointment = {
-  patient: { name: string; type: string; image: string };
-  location: string;
+  patient: { 
+    name: string; 
+    // type: string; 
+    image: string 
+    };
+//   location: string;
   date: ZonedDateTime;
   startTime: Time;
   endTime: Time;
@@ -56,10 +60,10 @@ export const CardUpcomingAppointment = (props: Appointment) => {
             }}
           />
         </div>
-        <p className="flex gap-4 items-center">
+        {/* <p className="flex gap-4 items-center">
           <FiMapPin />
           {props?.location}
-        </p>
+        </p> */}
       </div>
       <div className="flex gap-4 p-4 pt-0 my-4">
         <Image
@@ -71,12 +75,12 @@ export const CardUpcomingAppointment = (props: Appointment) => {
         />
         <div>
           <p className="text-xl font-bold">{props?.patient?.name}</p>
-          <p className="text-gray-600">{props?.patient?.type}</p>
+          {/* <p className="text-gray-600">{props?.patient?.type}</p> */}
         </div>
       </div>
       <div className="p-4 border-t flex gap-4">
         <Button variant="solid" color="primary" className="w-full">
-          Approve
+          Reschedule
         </Button>
         <Button
           variant="bordered"

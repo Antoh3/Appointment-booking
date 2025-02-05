@@ -10,6 +10,15 @@ import {
   TableHeader,
   TableRow,
   Pagination,
+  Button,
+  Tooltip,
+  useDisclosure,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  Input,
+  ModalFooter,
 } from "@nextui-org/react";
 import AppointmentStatusBadge from "@/components/AppointmentStatusBadge";
 import { AppointmentStatus } from "@/types";
@@ -19,7 +28,10 @@ import {
   Time,
 } from "@internationalized/date";
 import createAxiosInstance from "@/app/context/axiosInstance";
-import { useState,useEffect,useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { IoWarningOutline } from "react-icons/io5";
+import { FaCheck } from "react-icons/fa";
+import { message } from "antd";
 
 interface Appointment {
   id?: string;
@@ -40,14 +52,14 @@ const patients = [
     email: "james@mail.com",
     appointmentDate: "20-06-2024",
     type: "General",
-    status: "Active",
+    status: "active",
   },
   {
     name: "Angie Jamale",
     email: "angie@mail.com",
     appointmentDate: "20-06-2024",
     type: "General",
-    status: "Followedup",
+    status: "followedup",
   },
   {
     name: "Mary Mwoke",
@@ -82,15 +94,36 @@ const appointments = [
 ];
 
 export default function HomePage() {
-  const [appointments,setAppointments] = useState<Appointment[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const {
+    isOpen: isRescheduleOpen,
+    onOpen: onRescheduleOpen,
+    onOpenChange: onRescheduleOpenChange,
+    onClose: onRescheduleClose
+  } = useDisclosure();
+
+  const {
+    isOpen: isCancelOpen,
+    onOpen: onCancelOpen,
+    onOpenChange: onCancelOpenChange,
+    onClose: onCancelClose
+  } = useDisclosure();
+
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [newSchedule, setNewSchedule] = useState("");
+  const [cancelationReason, setCancelationReason] = useState("");
+
+
+
+
   const axiosInstance = createAxiosInstance();
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
   console.log("in appointments");
-  
+
   // console.log("All appointments",appointments);
-  
+
 
   useEffect(() => {
     fetchData();
@@ -108,6 +141,88 @@ export default function HomePage() {
       });
   }
 
+  const handleApproveAppointment = async (id: string) => {
+    try {
+      const res = await axiosInstance
+        .patch(`http://localhost:5001/appointment/approveappointment/${id}`, { status: "approved" })
+      setAppointments((prev) =>
+        prev.map((appt) => (appt.id === id ? { ...appt, status: "approved" } : appt))
+      );
+      if (res?.status === 200) {
+        message.success("Appointment approved");
+      }
+    } catch (error) {
+      console.error("Error in approvind appointment");
+
+    }
+  }
+
+  const handleCancelRequest = async () => {
+    if (!cancelationReason.trim()) return (message.error("Cancelationreson required"))
+    if (!selectedAppointment) return;
+
+    try {
+      const res = await axiosInstance
+        .patch(`http://localhost:5001/appointment/cancelappointment/${selectedAppointment.id}`,
+          { cancelationReason });
+
+      setAppointments((prev) =>
+        prev.map((appt) =>
+          appt.id === selectedAppointment.id ? { ...appt, status: "canceled" } : appt
+        )
+      );
+      onCancelOpenChange();
+
+      if (res?.status === 200) {
+        message.success("Appointment canceled");
+      }
+
+    } catch (error) {
+      console.error("Error in canceling appointment", error);
+
+    }
+  }
+
+  const rescheduleAppointment = async () => {
+    if (!newSchedule.trim()) return (message.error("New appointment time and date required"))
+    if (!selectedAppointment || !newSchedule) return;
+
+    try {
+      const res = await axiosInstance.patch(`/appointment/rescheduleappointment/${selectedAppointment.id}`, {
+        schedule: newSchedule,
+      });
+      fetchData()
+      setAppointments((prev) =>
+        prev.map((appt) =>
+          appt.id === selectedAppointment.id ? { ...appt, status: "rescheduled" } : appt
+        )
+      );
+      onRescheduleOpenChange()
+
+      if (res?.status === 200) {
+        message.success("Appointment Rescheduled")
+      }
+    } catch (error) {
+      console.error("Error rescheduling appointment:", error);
+    }
+  };
+
+  const handleCompleteAppointment = async (id:string | any) => {
+    try {
+      const res = await axiosInstance
+        .patch(`http://localhost:5001/appointment/completeappointment/${id}`, { status: "completed" })
+      setAppointments((prev) =>
+        prev.map((appt) => (appt.id === id ? { ...appt, status: "completed" } : appt))
+      );
+      if (res?.status === 200) {
+        message.success("Appointment completed successfully");
+      }
+    } catch (error) {
+      console.error("Error in completing appointment");
+
+    }
+  }
+
   const pages = Math.ceil(appointments.length / rowsPerPage);
   const paginatedAppointments = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -119,7 +234,7 @@ export default function HomePage() {
   return (
     <main className="flex flex-col gap-4 mx-0 px-0 w-full">
       <div className="grid md:grid-cols-3 gap-4 flex-wrap items-start ">
-        <div className="md:col-span-2 flex flex-col gap-4">
+        <div className="md:col-span-3 flex flex-col gap-4">
           <div className="grid md:grid-cols-3  gap-4 flex-wrap">
             <CardSummary title="Total Patients" value="50" />
             <CardSummary title="Total Appointments" value="20" />
@@ -131,7 +246,7 @@ export default function HomePage() {
             <Table
               aria-label="Example static collection table"
               removeWrapper
-              className="bg-white rounded-lg border p-2 "
+              className="bg-white rounded-lg border p-2 mr-2"
               selectionMode="single" bottomContent={
                 <div className="flex w-full justify-center">
                   <Pagination
@@ -150,12 +265,13 @@ export default function HomePage() {
                 <TableColumn>Scheduled Date & Time</TableColumn>
                 <TableColumn>Reason</TableColumn>
                 <TableColumn>Status</TableColumn>
+                <TableColumn>Actions</TableColumn>
               </TableHeader>
               <TableBody items={paginatedAppointments} emptyContent={"No appointments yet."}>
                 {appointments?.map((item: any, i: number) => (
                   <TableRow key={i}>
                     <TableCell>{item?.patientName}</TableCell>
-                    <TableCell>{item?.schedule}</TableCell>
+                    <TableCell>{new Date(item?.schedule).toLocaleTimeString()}</TableCell>
                     <TableCell>{item?.reason}</TableCell>
                     <TableCell>
                       <span
@@ -166,19 +282,150 @@ export default function HomePage() {
                         <AppointmentStatusBadge status={item?.status} />
                       </span>
                     </TableCell>
+                    <TableCell >
+                      <>
+                        <Tooltip
+                          showArrow={true}
+                          color="success"
+                          content={item.status === "approved" ? "Appointment approved" : "Approve appointment"}
+                          placement="top-start">
+                          <Button
+                            isIconOnly
+                            color="success"
+                            variant="faded"
+                            aria-label="Approve Appointment"
+                            className="m-1 bg-grren-200"
+                            isDisabled={item.status === "canceled" || item.status === "approved" || item.status === "completed"}
+                            onClick={() => handleApproveAppointment(item.id)}
+                          >
+                            <FaCheck />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip
+                          showArrow={true}
+                          content={item.status === "rescheduled" ? "Appointment rescheduled" : "Reschedule appointment"}
+                          color="warning"
+                          placement="top-start">
+                          <Button
+                            isIconOnly
+                            // color="danger"
+                            aria-label="Reschedule Appointment"
+                            // className="m-1 bg-yellow-200"
+                            // disabled={item.status === "canceled"}
+                            isDisabled={item.status === "canceled" || item.status === "completed"}
+                            onPress={() => {
+                              setSelectedAppointment(item)
+                              onRescheduleOpen()
+                            }}
+                          >
+                            {/* <RiEdit2Line /> */}
+                            📅
+                          </Button>
+                        </Tooltip>
+                        <Tooltip
+                          showArrow={true}
+                          color="danger"
+                          content={item.status === "canceled" ? "Apppointment canceled" : "Cancel appointment"}
+                          placement="top-end">
+                          <Button
+                            isIconOnly
+                            // color="danger"
+                            variant="faded"
+                            aria-label="Cancel Appointment"
+                            className="m-1 bg-red-500"
+                            isDisabled={item.status === "canceled" || item.status === "completed"}
+                            onPress={() => {
+                              setSelectedAppointment(item)
+                              onCancelOpen()
+                            }}
+                          >
+                            <IoWarningOutline />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip
+                          showArrow={true}
+                          color="primary"
+                          content={item.status === "completed" ? "Appointment completed" : "Complete appointment"}
+                          placement="top-end">
+                          <Button
+                            isIconOnly
+                            // color="danger"
+                            variant="bordered"
+                            aria-label="Cancel Appointment"
+                            className="m-1 bg-blue-500"
+                            isDisabled={item.status !== "approved"}
+                            onClick={() => handleCompleteAppointment(item.id)}
+                          >
+                            <IoWarningOutline />
+                          </Button>
+                        </Tooltip>
+                      </>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+
+            {/* Cancellation Modal */}
+            <Modal isOpen={isCancelOpen} onOpenChange={onCancelOpenChange} onClose={onCancelClose}>
+              <ModalContent>
+                {(onCancelClose) => (
+                  <>
+                    <ModalHeader>Cancel Appointment</ModalHeader>
+                    <ModalBody>
+                      <p>Are you sure you want to cancel this appointment?</p>
+                      <Input
+                        required
+                        type="text"
+                        label="Cancellation Reason"
+                        onChange={(e) => setCancelationReason(e.target.value)}
+                      />
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button color="danger" onClick={handleCancelRequest}>
+                        Confirm
+                      </Button>
+                      <Button onPress={onCancelClose}>
+                        Close
+                      </Button>
+                    </ModalFooter>
+                  </>
+                )}
+              </ModalContent>
+            </Modal>
+
+            {/* Reschedule Modal */}
+            <Modal isOpen={isRescheduleOpen} onOpenChange={onRescheduleOpenChange} onClose={onRescheduleClose}>
+              <ModalContent>
+                {(onRescheduleClose) => (
+                  <>
+                    <ModalHeader>Reschedule Appointment</ModalHeader>
+                    <ModalBody>
+                      <p>Select a new date and time:</p>
+                      <Input required type="datetime-local" onChange={(e) => setNewSchedule(e.target.value)} />
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button color="warning" onClick={rescheduleAppointment}>
+                        Reschedule
+                      </Button>
+                      <Button onPress={onRescheduleClose}>
+                        Close
+                      </Button>
+                    </ModalFooter>
+                  </>
+                )}
+              </ModalContent>
+            </Modal>
           </div>
           {/* end appointments */}
+
           {/* start patient */}
           <div>
             <h1 className="bold">All Patients</h1>
             <Table
               aria-label="Example static collection table"
               removeWrapper
-              className="bg-white rounded-lg border p-2"
+              className="bg-white rounded-lg border p-2 mr-2"
             >
               <TableHeader className="!bg-none">
                 <TableColumn>Patient Name</TableColumn>
@@ -186,13 +433,14 @@ export default function HomePage() {
                 <TableColumn>Appointment Date</TableColumn>
                 <TableColumn>Department</TableColumn>
                 <TableColumn>Status</TableColumn>
+                <TableColumn>Actions</TableColumn>
               </TableHeader>
               <TableBody emptyContent={"No patients yet."}>
                 {patients?.map((item: any, i: number) => (
                   <TableRow key={i}>
                     <TableCell>{item?.name}</TableCell>
                     <TableCell>{item?.email}</TableCell>
-                    <TableCell>{item?.appointmentDate}</TableCell>
+                    <TableCell>{new Date(item?.appointmentDate).toLocaleTimeString()}</TableCell>
                     <TableCell>{item?.type}</TableCell>
                     <TableCell>
                       <span
@@ -202,6 +450,50 @@ export default function HomePage() {
                       >
                         <AppointmentStatusBadge status={item?.status} />
                       </span>
+                    </TableCell>
+                    <TableCell >
+                      <>
+                        <Tooltip
+                          showArrow={true}
+                          content={item.status === "rescheduled" ? "Rescheduled" : "Reschedule"}
+                          color="warning"
+                          placement="top-start">
+                          <Button
+                            isIconOnly
+                            // color="danger"
+                            aria-label="Reschedule patient"
+                          // className="m-1 bg-yellow-200"
+                          // disabled={item.status === "canceled"}
+                          // onPress={() => {
+                          //   setSelectedAppointment(item)
+                          //   onRescheduleOpen()
+                          // }}
+                          >
+                            {/* <RiEdit2Line /> */}
+                            📅
+                          </Button>
+                        </Tooltip>
+                        <Tooltip
+                          showArrow={true}
+                          color="danger"
+                          content={item.status === "canceled" ? "FollowedUp" : "FollowUp"}
+                          placement="top-end">
+                          <Button
+                            isIconOnly
+                            // color="danger"
+                            variant="faded"
+                            aria-label="FollowUp patient"
+                            className="m-1 bg-blue-300"
+                          // isDisabled={item.status === "canceled"}
+                          // onPress={() => {
+                          //   setSelectedAppointment(item)
+                          //   onCancelOpen()
+                          // }}
+                          >
+                            <FaCheck />
+                          </Button>
+                        </Tooltip>
+                      </>
                     </TableCell>
                   </TableRow>
                 ))}

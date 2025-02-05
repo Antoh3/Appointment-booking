@@ -26,12 +26,14 @@ export const appointmentIcon ={
   scheduled : FaRegHourglass,
   approved: FaCheck,
   canceled: IoWarningOutline,
-  Active: FaCheck,
-  Followedup: FaCheck,
+  active: FaCheck,
+  followedup: FaCheck,
   available: IoAirplaneOutline,
   assigned: MdAssignment,
   on_route: FaRoute,
   mantainance: IoArchiveOutline,
-  Completed: FaCheck,
+  completed: FaCheck,
   pending: FaRegHourglass,
+  accepted: FaCheck,
+  rescheduled: FaRegHourglass
 }

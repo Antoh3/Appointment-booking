@@ -48,12 +48,12 @@ export const patientConfig: PatientConfig = {
       ],
     },
     {
-      title: "Settings",
+      title: "Site help",
       items: [
         {
-          title: "Settings",
+          title: "Profile",
           href: "/patient/settings",
-          icon: "settings",
+          icon: "profile",
         },
         {
           title: "Help & Support",

@@ -345,6 +345,7 @@ const searchDoctors = async (req,res) => {
     }
 }
 
+
 // Controller function for updating an appointment
 // const updateAppointment = async (req, res) => {
 //     try {

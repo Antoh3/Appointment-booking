@@ -8,7 +8,10 @@ const {
   deletePatientById,
   updateAppointment,
   searchDoctors,
-  loginPatient1
+  loginPatient1,
+  cancelAppointment,
+  cancelRequest,
+  rescheduleAppointment
 } = require("../Controllers/PatientController");
 const { authenticateToken  }= require("../Middlewares/JWT.authentication");
 const { PatientAuth } = require("../Middlewares/RoleBased.authentication");
@@ -37,19 +40,23 @@ const storage = multer.diskStorage({
 
 
 
-// Register a new patient
-PatientRouter.post("/register",authenticateToken,registerPatient);
+// Register/login/search a new patient/doctor
 PatientRouter.post("/user", registerUser)
-// Login a patient
 PatientRouter.post("/login", loginPatient);
 PatientRouter.post("/login1", loginPatient1);
 PatientRouter.get("/search",searchDoctors)
+
 // Get a patient by ID
 PatientRouter.get("/patient",authenticateToken, getPatientById);
-// Update a patient by ID
+PatientRouter.post("/register",authenticateToken,registerPatient);
 PatientRouter.put("/updatePatient",authenticateToken,uploadFields,updatePatientById);
+
 // PatientRouter.patch("/:patientId", updatePatientById);
 PatientRouter.patch("/appointment/:patientId", updateAppointment);
+PatientRouter.patch("/cancelappointment/:appointmentId", cancelAppointment);
+PatientRouter.patch("/rescheduleappointment/:appointmentId", rescheduleAppointment);
+PatientRouter.patch("/cancelrequest/:ambulanceRequestId", cancelRequest);
+
 // Delete a patient by ID
 PatientRouter.delete("/deletePatient",authenticateToken,deletePatientById);
 

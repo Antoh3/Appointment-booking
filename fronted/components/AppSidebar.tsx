@@ -5,9 +5,10 @@ import {
   FiHome,
   FiSettings,
   FiUsers,
+  FiLogOut
 } from "react-icons/fi";
 import { LiaAllergiesSolid } from "react-icons/lia";
-import { FaPrescription } from "react-icons/fa";
+import { FaPrescription,FaUser } from "react-icons/fa";
 import Link from "next/link";
 
 const menuItems = [
@@ -47,17 +48,22 @@ const menuItems = [
     ],
   },
   {
-    title: "Settings",
+    title: "Site Help",
     children: [
       {
-        title: "Settings",
-        icon: <FiSettings />,
-        link: "/app/settings",
+        title: "Profile",
+        icon: <FaUser />,
+        link: "/app/help",
       },
       {
         title: "Help & Support",
         icon: <FiHelpCircle />,
         link: "/app/help",
+      },
+      {
+        title: "Logout",
+        icon: <FiLogOut />,
+        link: "/auth/doctor/login",
       },
     ],
   },

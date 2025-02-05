@@ -7,7 +7,7 @@ import {
   FiArrowRight,
 } from "react-icons/fi";
 import { LiaAllergiesSolid } from "react-icons/lia";
-import { FaPrescription,FaAmbulance } from "react-icons/fa";
+import { FaPrescription,FaAmbulance,FaUser } from "react-icons/fa";
 import { TbLogout2 } from "react-icons/tb";
 import { BsFillChatRightDotsFill } from "react-icons/bs";
 
@@ -23,4 +23,5 @@ export const Icons = {
   arrowRight: FiArrowRight,
   ambulance:FaAmbulance,
   logout: TbLogout2,
+  profile: FaUser
 };

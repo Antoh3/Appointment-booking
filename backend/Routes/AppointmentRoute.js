@@ -6,6 +6,10 @@ const {
   deleteAppointmentById,
   getPatientAppointmentById,
   getDoctorAppointmentById,
+  rescheduleAppointment,
+  cancelAppointment,
+  approveAppointment,
+  completeAppointment
 } = require("../Controllers/AppointmentController");
 const Auth = require("../Middlewares/JWT.authentication");
 
@@ -14,11 +18,14 @@ AppointmentRouter.post("/bookAppointment",Auth.authenticateToken, createAppointm
 
 // Get a single appointment by ID
 AppointmentRouter.get("/doctor",Auth.authenticateToken, getDoctorAppointmentById);
-
 AppointmentRouter.get("/patient",Auth.authenticateToken, getPatientAppointmentById);
 
 // Update an appointment by ID
-AppointmentRouter.put("/:appointmentId",  updateAppointmentById);   
+AppointmentRouter.put("/:appointmentId",  updateAppointmentById); 
+AppointmentRouter.patch("/rescheduleappointment/:appointmentId",rescheduleAppointment)  
+AppointmentRouter.patch("/approveappointment/:appointmentId",approveAppointment)  
+AppointmentRouter.patch("/cancelappointment/:appointmentId",cancelAppointment)  
+AppointmentRouter.patch("/completeappointment/:appointmentId",completeAppointment)  
 
 // Delete an appointment by ID
 AppointmentRouter.delete("/:appointmentId",  deleteAppointmentById);

@@ -247,10 +247,121 @@ const deleteAppointmentById = async (req, res) => {
     }
 };
 
+const rescheduleAppointment = async (req,res) => {
+    const { appointmentId } = req.params;
+    const { schedule } = req.body;
+
+
+    const findAppintment = await prisma.appointment.findUnique({
+        where:{
+            id:appointmentId
+        }
+    })
+
+    if (!findAppintment) {
+        return res.status(404).json({message:"appintmentId not found"});
+    }
+
+    const updatedAppointment = await prisma.appointment.update({
+        where:{
+            id:appointmentId
+        },
+        data:{
+            schedule: new Date(schedule),
+            status:'rescheduled'
+        }
+    })
+    console.log(updatedAppointment)
+    return res.status(200).json(updatedAppointment)
+}
+
+const approveAppointment = async (req,res) => {
+    const { appointmentId } = req.params;
+    const { status } = req.body;
+
+
+    const findAppintment = await prisma.appointment.findUnique({
+        where:{
+            id:appointmentId
+        }
+    })
+
+    if (!findAppintment) {
+        return res.status(404).json({message:"appintmentId not found"});
+    }
+
+    const updatedAppointment = await prisma.appointment.update({
+        where:{
+            id:appointmentId
+        },
+        data:{
+            status
+        }
+    })
+    return res.status(200).json(updatedAppointment)
+}
+
+const cancelAppointment = async (req,res) => {
+    const { appointmentId } = req.params;
+    const { status,cancelationReason } = req.body;
+
+
+    const findAppintment = await prisma.appointment.findUnique({
+        where:{
+            id:appointmentId
+        }
+    })
+
+    if (!findAppintment) {
+        return res.status(404).json({message:"appintmentId not found"});
+    }
+
+    const updatedAppointment = await prisma.appointment.update({
+        where:{
+            id:appointmentId
+        },
+        data:{
+            status:"canceled",
+            cancelationReason
+        }
+    })
+    return res.status(200).json(updatedAppointment)
+}
+
+const completeAppointment = async (req,res) => {
+    const { appointmentId } = req.params;
+    // const { status } = req.body;
+
+
+    const findAppintment = await prisma.appointment.findUnique({
+        where:{
+            id:appointmentId
+        }
+    })
+
+    if (!findAppintment) {
+        return res.status(404).json({message:"appintmentId not found"});
+    }
+
+    const updatedAppointment = await prisma.appointment.update({
+        where:{
+            id:appointmentId
+        },
+        data:{
+            status:"completed"
+        }
+    })
+    return res.status(200).json(updatedAppointment)
+}
+
 module.exports = {
     createAppointment,
     getDoctorAppointmentById,
     updateAppointmentById,
     deleteAppointmentById,
-    getPatientAppointmentById
+    getPatientAppointmentById,
+    rescheduleAppointment,
+    approveAppointment,
+    cancelAppointment,
+    completeAppointment,
 };

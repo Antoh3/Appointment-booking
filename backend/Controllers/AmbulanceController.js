@@ -297,6 +297,7 @@ const getAllAmbulanceRequests = async (req, res) => {
             patientId: patientId
         },
         select: {
+            id: true,
             aidCarType: true,
             status: true,
 
@@ -322,6 +323,8 @@ const getAllAmbulanceRequests = async (req, res) => {
 
 const getAmbulanceById = async (req, res) => {
     const { ambulanceId } = req.params;
+    console.log("in ambulance id");
+    
 
     const ambulance = await prisma.ambulance.findUnique({
         where: {
@@ -362,6 +365,59 @@ const updateAmbulance = async (req, res) => {
 
     res.status(201).json(updatedAmbulance)
 }
+
+const approveAmbulance = async (req,res) => {
+    const { ambulanceId } = req.params;
+    const { status } = req.body;
+    console.log("In ambulance approve");
+    
+
+    const ambulance = await prisma.ambulance.findUnique({
+        where:{
+            id:ambulanceId
+        }
+    })
+
+    if (!ambulance) {
+        return res.status(404).json({message: "ambulance id not found"})
+    }
+
+    const updatedStatus = await prisma.ambulance.update({
+        where:{
+            id:ambulanceId
+        },
+        data:{
+            status
+        }
+    })
+    res.status(200).json(updatedStatus)
+}
+
+const approveAmbulanceRequest = async (req,res) => {
+    const { ambulanceRequestId } = req.params;
+    const { status } = req.body;
+
+    const ambulanceRequest = await prisma.ambulanceRequest.findUnique({
+        where:{
+            id:ambulanceRequestId
+        }
+    })
+
+    if (!ambulanceRequest) {
+        res.status(404).json({message:"ambulanceRequestId not found"});
+    }
+
+    const updatedAmbulanceRequest = await prisma.ambulanceRequest.update({
+        where:{
+            id:ambulanceRequestId
+        },
+        data:{
+            status
+        }
+    })
+    res.status(200).json(updatedAmbulanceRequest);
+}
+
 module.exports = {
     ambulanceRequest,
     createAmbulance,
@@ -370,4 +426,6 @@ module.exports = {
     getAmbulanceById,
     updateAmbulance,
     getAllAmbulanceRequests,
+    approveAmbulance,
+    approveAmbulanceRequest,
 }
